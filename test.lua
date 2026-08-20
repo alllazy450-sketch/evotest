@@ -493,49 +493,6 @@ local Player = Players.LocalPlayer
 -- ==========================================
 
 -- ==========================================
--- FUNGSI-FUNGSI SAFETY UNTUK UI CALLBACK
--- ==========================================
-local function safeCall(func, ...)
-    if type(func) == "function" then
-        return func(...)
-    end
-    warn("Function is nil, skipping call")
-    return nil
-end
-
--- Definisikan variabel global yang mungkin hilang
-getgenv().System = getgenv().System or {}
-getgenv().System.__properties = getgenv().System.__properties or {}
-getgenv().System.__config = getgenv().System.__config or {}
-getgenv().System.__config.__curve_names = getgenv().System.__config.__curve_names or {"Camera", "Random", "Accelerated", "Backwards", "Slow", "High", "Left", "Right", "Straight", "RandomTarget"}
-getgenv().System.autoparry = getgenv().System.autoparry or { start = function() end, stop = function() end }
-getgenv().System.triggerbot = getgenv().System.triggerbot or { enable = function() end }
-getgenv().System.manual_spam = getgenv().System.manual_spam or { start = function() end, stop = function() end }
-getgenv().System.auto_spam = getgenv().System.auto_spam or { start = function() end, stop = function() end }
-getgenv().System.parry = getgenv().System.parry or { execute = function() end, execute_action = function() end }
-getgenv().System.curve = getgenv().System.curve or { get_cframe = function() return CFrame.new() end }
-
--- Fungsi-fungsi lain yang mungkin dipanggil
-apply_fps_boost = apply_fps_boost or function() end
-apply_filter_state = apply_filter_state or function() end
-enable_ball_stats = enable_ball_stats or function() end
-disable_ball_stats = disable_ball_stats or function() end
-start_ability_esp = start_ability_esp or function() end
-stop_ability_esp = stop_ability_esp or function() end
-apply_thunder_dash_exploit = apply_thunder_dash_exploit or function() end
-start_thunder_dash_exploit = start_thunder_dash_exploit or function() end
-stop_thunder_dash_exploit = stop_thunder_dash_exploit or function() end
-auto_play_set_enabled = auto_play_set_enabled or function() end
-checkModPlayers = checkModPlayers or function() end
-update_divisor = update_divisor or function() end
-update_randomized_accuracy = update_randomized_accuracy or function() end
-warn_manual_spam_cps = warn_manual_spam_cps or function() end
-play_sound_by_id = play_sound_by_id or function() end
-get_sound_id = get_sound_id or function() return "rbxassetid://0" end
-ensureAtmo = ensureAtmo or function() return Instance.new("Atmosphere") end
-ensureCC = ensureCC or function() return Instance.new("ColorCorrectionEffect") end
-
--- ==========================================
 -- BUAT TAB-TAB UTAMA
 -- ==========================================
 local Tabs = {
@@ -578,10 +535,10 @@ local autoParryToggle = MainSub:AddToggle({
         if System then
             System.__properties.__autoparry_enabled = state
             if state then
-                safeCall(System.autoparry.start)
+                if System.autoparry and System.autoparry.start then pcall(System.autoparry.start) end
                 if getgenv().AutoParryNotify then sendNotification("Auto Parry", "ON", 2, "success") end
             else
-                safeCall(System.autoparry.stop)
+                if System.autoparry and System.autoparry.stop then pcall(System.autoparry.stop) end
                 if getgenv().AutoParryNotify then sendNotification("Auto Parry", "OFF", 2, "error") end
             end
         end
@@ -622,11 +579,12 @@ MainSub:AddSlider({
     Callback = function(value)
         if System and not System.__properties.__humanizer_enabled then
             System.__properties.__accuracy = value
-            safeCall(update_divisor)
+            if update_divisor then pcall(update_divisor) end
         end
     end
 })
 
+-- AddCheckbox → AddToggle
 MainSub:AddToggle({
     Name = "Cooldown Protection",
     Default = false,
@@ -644,7 +602,52 @@ MainSub:AddToggle({
     Default = false,
     Callback = function(state)
         getgenv().AutoPreClick = state
-        -- Backend logic handled elsewhere
+        if state then
+            if not getgenv()._ZX_PreClickConn then
+                getgenv()._ZX_PreClickSender = nil
+                getgenv()._ZX_PreClickSpeeds = {}
+                getgenv()._ZX_PreClickParried = {}
+                getgenv()._ZX_PreClickConn = RunService.PreSimulation:Connect(function()
+                    if not getgenv().AutoPreClick then return end
+                    local sender = getgenv()._ZX_PreClickSender
+                    if not sender or sender == "" then return end
+                    if getgenv()._ZX_PreClickParried[sender] then return end
+                    local alive = workspace:FindFirstChild("Alive")
+                    if not alive then return end
+                    local ball = alive:FindFirstChild(sender)
+                    if ball then return end
+                    local speeds = getgenv()._ZX_PreClickSpeeds[sender]
+                    if not speeds then return end
+                    local fastEnough = false
+                    for _, s in ipairs(speeds) do
+                        if s >= 800 then
+                            fastEnough = true
+                            break
+                        end
+                    end
+                    if fastEnough then
+                        getgenv()._ZX_PreClickParried[sender] = true
+                        local delay = math.random(120, 140) / 1000
+                        task.delay(delay, function()
+                            if System and System.parry and System.parry.execute_action then
+                                System.parry.execute_action()
+                            end
+                            getgenv()._ZX_PreClickParried[sender] = nil
+                        end)
+                    end
+                    getgenv()._ZX_PreClickSender = nil
+                    getgenv()._ZX_PreClickSpeeds = {}
+                end)
+            end
+        else
+            if getgenv()._ZX_PreClickConn then
+                getgenv()._ZX_PreClickConn:Disconnect()
+                getgenv()._ZX_PreClickConn = nil
+            end
+            getgenv()._ZX_PreClickSender = nil
+            getgenv()._ZX_PreClickSpeeds = {}
+            getgenv()._ZX_PreClickParried = {}
+        end
     end
 })
 
@@ -662,21 +665,20 @@ MainSub:AddToggle({
     Callback = function(state)
         if System then
             System.__properties.__humanizer_enabled = state
-            if state then safeCall(update_randomized_accuracy) end
+            if state and update_randomized_accuracy then pcall(update_randomized_accuracy) end
         end
     end
 })
-
-MainSub:AddSlider({
+MainSub:AddRangeSlider({
     Name = "Humanizer Accuracy",
-    Default = 10,
+    Default = {min = 1, max = 25},
     Min = 1,
     Max = 25,
     Rounding = 1,
-    Callback = function(value)
+    Callback = function(min_val, max_val)
         if System then
-            System.__properties.__humanizer_min_accuracy = value
-            System.__properties.__humanizer_max_accuracy = value
+            System.__properties.__humanizer_min_accuracy = min_val
+            System.__properties.__humanizer_max_accuracy = max_val
         end
     end
 })
@@ -689,8 +691,13 @@ MainSub:AddToggle({
     Callback = function(state)
         if System then
             System.__properties.__triggerbot_enabled = state
-            safeCall(System.triggerbot.enable, state)
-            if getgenv().TriggerbotNotify then sendNotification("Triggerbot", state and "ON" or "OFF", 2, state and "success" or "error") end
+            if state then
+                if System.triggerbot and System.triggerbot.enable then pcall(System.triggerbot.enable, true) end
+                if getgenv().TriggerbotNotify then sendNotification("Triggerbot", "ON", 2, "success") end
+            else
+                if System.triggerbot and System.triggerbot.enable then pcall(System.triggerbot.enable, false) end
+                if getgenv().TriggerbotNotify then sendNotification("Triggerbot", "OFF", 2, "error") end
+            end
         end
     end
 })
@@ -940,10 +947,10 @@ BlatantSub:AddToggle({
     Callback = function(value)
         getgenv().AbilityExploit = value
         if value and getgenv().ThunderDashNoCooldown then
-            safeCall(apply_thunder_dash_exploit)
-            safeCall(start_thunder_dash_exploit)
+            apply_thunder_dash_exploit()
+            start_thunder_dash_exploit()
         else
-            safeCall(stop_thunder_dash_exploit)
+            stop_thunder_dash_exploit()
         end
     end
 })
@@ -953,10 +960,10 @@ BlatantSub:AddToggle({
     Callback = function(value)
         getgenv().ThunderDashNoCooldown = value
         if value and getgenv().AbilityExploit then
-            safeCall(apply_thunder_dash_exploit)
-            safeCall(start_thunder_dash_exploit)
+            apply_thunder_dash_exploit()
+            start_thunder_dash_exploit()
         else
-            safeCall(stop_thunder_dash_exploit)
+            stop_thunder_dash_exploit()
         end
     end
 })
@@ -966,7 +973,7 @@ BlatantSub:AddToggle({
     Default = false,
     Callback = function(state)
         if state then
-            safeCall(getgenv()._ZX_SetupSemiImmortal)
+            getgenv()._ZX_SetupSemiImmortal()
             sendNotification("Semi Immortality", "Floating panel shown", 3, "info")
         else
             local pg = LocalPlayer:FindFirstChild("PlayerGui")
@@ -994,9 +1001,9 @@ SpamSub:AddToggle({
             sendNotification("Manual Spam", state and "ON" or "OFF", 2, state and "success" or "error")
         end
         if state then
-            safeCall(System.manual_spam.start)
+            if System and System.manual_spam and System.manual_spam.start then pcall(System.manual_spam.start) end
         else
-            safeCall(System.manual_spam.stop)
+            if System and System.manual_spam and System.manual_spam.stop then pcall(System.manual_spam.stop) end
         end
     end
 })
@@ -1013,7 +1020,7 @@ SpamSub:AddSlider({
     Rounding = 1,
     Callback = function(value)
         getgenv().ManualSpamCPS = value
-        safeCall(warn_manual_spam_cps, value)
+        warn_manual_spam_cps(value)
     end
 })
 SpamSub:AddToggle({
@@ -1030,10 +1037,10 @@ SpamSub:AddToggle({
         if System and System.auto_spam then
             System.__properties.__auto_spam_enabled = state
             if state then
-                safeCall(System.auto_spam.start)
+                if System.auto_spam and System.auto_spam.start then pcall(System.auto_spam.start) end
                 if getgenv().AutoSpamNotify then sendNotification("Auto Spam", "ON", 2, "success") end
             else
-                safeCall(System.auto_spam.stop)
+                if System.auto_spam and System.auto_spam.stop then pcall(System.auto_spam.stop) end
                 if getgenv().AutoSpamNotify then sendNotification("Auto Spam", "OFF", 2, "error") end
             end
         end
@@ -1086,7 +1093,7 @@ DetectionSub:AddToggle({
         getgenv().ModDetection = state
         if state then
             if modMonitorConnection then modMonitorConnection:Disconnect(); modMonitorConnection = nil end
-            safeCall(checkModPlayers)
+            checkModPlayers()
             modMonitorConnection = RunService.Heartbeat:Connect(checkModPlayers)
         else
             if modMonitorConnection then modMonitorConnection:Disconnect(); modMonitorConnection = nil end
@@ -1203,7 +1210,7 @@ PlayerSub:AddToggle({
     Name = "Auto Play",
     Default = false,
     Callback = function(value)
-        safeCall(auto_play_set_enabled, value)
+        auto_play_set_enabled(value)
     end
 })
 PlayerSub:AddToggle({
@@ -1356,7 +1363,7 @@ PlayerSub:AddToggle({
         end
     end
 })
-PlayerSub:AddInput({
+PlayerSub:AddTextbox({
     Name = "Spoofed Name",
     Placeholder = "Enter fake name...",
     Default = "",
@@ -1748,7 +1755,7 @@ VisualSub:AddToggle({
     Callback = function(value)
         getgenv().sound_controller = value
         if value then
-            safeCall(play_sound_by_id, get_sound_id(selectedSound))
+            play_sound_by_id(get_sound_id(selectedSound))
         else
             currentSound:Stop()
         end
@@ -1775,7 +1782,7 @@ VisualSub:AddDropdown({
         getgenv().SelectedSound = value
         selectedSound = value
         if getgenv().sound_controller then
-            safeCall(play_sound_by_id, get_sound_id(value))
+            play_sound_by_id(get_sound_id(value))
         end
     end
 })
@@ -1815,7 +1822,7 @@ VisualSub:AddToggle({
         end
     end
 })
-VisualSub:AddInput({
+VisualSub:AddTextbox({
     Name = "Ping Value",
     Placeholder = "Enter Fake Ping Number",
     Default = "333",
@@ -1834,9 +1841,9 @@ VisualSub:AddToggle({
     Callback = function(state)
         getgenv().BallStats = state
         if state then
-            safeCall(enable_ball_stats)
+            enable_ball_stats()
         else
-            safeCall(disable_ball_stats)
+            disable_ball_stats()
         end
     end
 })
@@ -1971,7 +1978,7 @@ VisualSub:AddToggle({
         end
     end
 })
-VisualSub:AddInput({
+VisualSub:AddTextbox({
     Name = "Custom Announcement Text",
     Placeholder = "Enter Custom Announcement...",
     Default = "discord.gg/Wisnu",
@@ -1990,7 +1997,7 @@ VisualSub:AddToggle({
     Name = "Ability ESP",
     Default = false,
     Callback = function(state)
-        if state then safeCall(start_ability_esp) else safeCall(stop_ability_esp) end
+        if state then start_ability_esp() else stop_ability_esp() end
     end
 })
 
@@ -2004,7 +2011,7 @@ MiscSub:AddSection("Optimization")
 MiscSub:AddToggle({
     Name = "FPS Booster",
     Default = false,
-    Callback = function(state) safeCall(apply_fps_boost, state) end
+    Callback = function(state) apply_fps_boost(state) end
 })
 MiscSub:AddToggle({
     Name = "Low Graphics",
@@ -2072,7 +2079,7 @@ WorldSub:AddToggle({
     Default = false,
     Callback = function(value)
         getgenv().FilterEnabled = value
-        safeCall(apply_filter_state)
+        apply_filter_state()
     end
 })
 WorldSub:AddToggle({
@@ -2080,7 +2087,7 @@ WorldSub:AddToggle({
     Default = false,
     Callback = function(value)
         getgenv().AtmosphereEnabled = value
-        safeCall(apply_filter_state)
+        apply_filter_state()
     end
 })
 WorldSub:AddSlider({
@@ -2091,7 +2098,7 @@ WorldSub:AddSlider({
     Rounding = 2,
     Callback = function(value)
         getgenv().AtmosphereDensity = value
-        if getgenv().FilterEnabled then safeCall(apply_filter_state) end
+        if getgenv().FilterEnabled then apply_filter_state() end
     end
 })
 WorldSub:AddToggle({
@@ -2099,7 +2106,7 @@ WorldSub:AddToggle({
     Default = false,
     Callback = function(value)
         getgenv().SaturationEnabled = value
-        safeCall(apply_filter_state)
+        apply_filter_state()
     end
 })
 WorldSub:AddSlider({
@@ -2110,7 +2117,7 @@ WorldSub:AddSlider({
     Rounding = 2,
     Callback = function(value)
         getgenv().SaturationLevel = value
-        if getgenv().FilterEnabled then safeCall(apply_filter_state) end
+        if getgenv().FilterEnabled then apply_filter_state() end
     end
 })
 WorldSub:AddToggle({
@@ -2118,7 +2125,7 @@ WorldSub:AddToggle({
     Default = false,
     Callback = function(value)
         getgenv().HueEnabled = value
-        safeCall(apply_filter_state)
+        apply_filter_state()
     end
 })
 WorldSub:AddSlider({
@@ -2129,21 +2136,21 @@ WorldSub:AddSlider({
     Rounding = 2,
     Callback = function(value)
         getgenv().HueShift = value
-        if getgenv().FilterEnabled then safeCall(apply_filter_state) end
+        if getgenv().FilterEnabled then apply_filter_state() end
     end
 })
 
 -- Atmosphere, Color Correction, Lighting, Sky
 WorldSub:AddSection("Atmosphere")
-WorldSub:AddSlider({Name = "Density", Default = 30, Min = 0, Max = 100, Rounding = 1, Callback = function(v) safeCall(ensureAtmo).Density = v / 100 end})
-WorldSub:AddSlider({Name = "Offset", Default = 25, Min = 0, Max = 100, Rounding = 1, Callback = function(v) safeCall(ensureAtmo).Offset = v / 100 end})
-WorldSub:AddSlider({Name = "Glare", Default = 0, Min = 0, Max = 100, Rounding = 1, Callback = function(v) safeCall(ensureAtmo).Glare = v / 100 end})
-WorldSub:AddSlider({Name = "Haze", Default = 10, Min = 0, Max = 100, Rounding = 1, Callback = function(v) safeCall(ensureAtmo).Haze = v / 100 end})
+WorldSub:AddSlider({Name = "Density", Default = 30, Min = 0, Max = 100, Rounding = 1, Callback = function(v) ensureAtmo().Density = v / 100 end})
+WorldSub:AddSlider({Name = "Offset", Default = 25, Min = 0, Max = 100, Rounding = 1, Callback = function(v) ensureAtmo().Offset = v / 100 end})
+WorldSub:AddSlider({Name = "Glare", Default = 0, Min = 0, Max = 100, Rounding = 1, Callback = function(v) ensureAtmo().Glare = v / 100 end})
+WorldSub:AddSlider({Name = "Haze", Default = 10, Min = 0, Max = 100, Rounding = 1, Callback = function(v) ensureAtmo().Haze = v / 100 end})
 
 WorldSub:AddSection("Color Correction")
-WorldSub:AddSlider({Name = "Saturation", Default = 100, Min = 0, Max = 200, Rounding = 1, Callback = function(v) safeCall(ensureCC).Saturation = (v - 100) / 100 end})
-WorldSub:AddSlider({Name = "Contrast", Default = 100, Min = 0, Max = 200, Rounding = 1, Callback = function(v) safeCall(ensureCC).Contrast = (v - 100) / 100 end})
-WorldSub:AddSlider({Name = "Brightness", Default = 100, Min = 0, Max = 200, Rounding = 1, Callback = function(v) safeCall(ensureCC).Brightness = (v - 100) / 100 end})
+WorldSub:AddSlider({Name = "Saturation", Default = 100, Min = 0, Max = 200, Rounding = 1, Callback = function(v) ensureCC().Saturation = (v - 100) / 100 end})
+WorldSub:AddSlider({Name = "Contrast", Default = 100, Min = 0, Max = 200, Rounding = 1, Callback = function(v) ensureCC().Contrast = (v - 100) / 100 end})
+WorldSub:AddSlider({Name = "Brightness", Default = 100, Min = 0, Max = 200, Rounding = 1, Callback = function(v) ensureCC().Brightness = (v - 100) / 100 end})
 
 WorldSub:AddSection("Lighting")
 WorldSub:AddSlider({Name = "Brightness", Default = 20, Min = 0, Max = 100, Rounding = 1, Callback = function(v) Lighting.Brightness = v / 10 end})
@@ -2214,23 +2221,9 @@ UnlockSub:AddToggle({
 })
 
 -- ==========================================
--- PERBAIKAN SAFETY CHECK UNTUK REMOTE
+-- FUNGSI-FUNGSI SETUP TAMBAHAN
 -- ==========================================
--- Fungsi untuk memanggil remote dengan aman
-local function safeFireServer(remote, ...)
-    if remote and type(remote.FireServer) == "function" then
-        pcall(function() remote:FireServer(...) end)
-        return true
-    end
-    return false
-end
-
-local function safeInvokeServer(remote, ...)
-    if remote and type(remote.InvokeServer) == "function" then
-        return pcall(function() return remote:InvokeServer(...) end)
-    end
-    return false, "Remote not available"
-end
+-- (Fungsi-fungsi seperti _ZX_SetupSingularity, _ZX_SetupLookAtBall, dll sudah didefinisikan di backend)
 
 -- ==========================================
 -- NOTIFIKASI AWAL
