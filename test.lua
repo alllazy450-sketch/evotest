@@ -1,21 +1,34 @@
--- [[ WISNU HUB | OXIDELIB UI & BACKEND FIXED ]] --
+-- ============================================================
+--  WISNU HUB | EVOMON v3 (PORTED TO OXIDELIB)
+--  Semua logika backend Evomon dipertahankan.
+-- ============================================================
 
+-- ==========================================
+-- LOAD OXIDELIB
+-- ==========================================
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Naellx/Oxidelib/main/Oxidelib.lua"))()
 Library:SetTheme("OLED")
 
+-- ==========================================
+-- LOGO DAN WINDOW
+-- ==========================================
+local MY_LOGO = "rbxassetid://75991977420487"  -- Logo WISNU HUB
+
 local Window = Library:CreateWindow({
     Name = "WISNU HUB",
-    BrandSubtitle = "evomon v3",
-    Logo = "rbxassetid://75991977420487",
+    BrandSubtitle = "Evomon v3",
+    Logo = MY_LOGO,
     LogoZoom = 1.5,
-    Size = UDim2.fromOffset(720, 500)
+    ToggleKey = Enum.KeyCode.RightShift,
+    ProfileKey = Enum.KeyCode.K,   -- tidak digunakan, bisa diabaikan
+    Size = UDim2.fromOffset(720, 500),
+    LoadingText = "WISNU HUB",
+    LoadingSubtitle = "Loading Evomon Engine...",
 })
 
--- Watermark Transparency
-task.spawn(function()
-    task.wait(0.5)
-    if Window.Watermark then Window.Watermark.ImageTransparency = 0.4 end
-end)
+-- ==========================================
+-- BACKEND EVOMON (DIBAWAH INI TIDAK DIRUBAH)
+-- ==========================================
 
 local Svc = {
     Players  = game:GetService("Players"),
@@ -525,10 +538,11 @@ local function validateConflicts(source)
             rule.apply()
             if Window then
                 pcall(function()
-                    Library:Notify({
+                    Window:Notify({
                         Title    = "⚠️ Konflik Toggle",
-                        Description  = rule.msg,
+                        Content  = rule.msg,
                         Duration = 4,
+                        Type = "warning",
                     })
                 end)
             end
@@ -643,10 +657,11 @@ local function handleCatch()
         if S_TargetFarm then
             S_TargetFarm = false
             pcall(function()
-                Library:Notify({
+                Window:Notify({
                     Title    = "💎 Prismatic Detected",
-                    Description  = "Auto Stop aktif — semua farm dihentikan. Tangkap manual!",
+                    Content  = "Auto Stop aktif — semua farm dihentikan. Tangkap manual!",
                     Duration = 6,
+                    Type = "warning",
                 })
             end)
         end
@@ -667,10 +682,11 @@ local function handleCatch()
         if S_TargetFarm then
             S_TargetFarm = false
             pcall(function()
-                Library:Notify({
+                Window:Notify({
                     Title    = "✨ Shiny Detected",
-                    Description  = "Auto Stop aktif — semua farm dihentikan. Tangkap manual!",
+                    Content  = "Auto Stop aktif — semua farm dihentikan. Tangkap manual!",
                     Duration = 6,
+                    Type = "warning",
                 })
             end)
         end
@@ -1370,27 +1386,20 @@ workspace.DescendantAdded:Connect(function(obj)
     end
 end)
 
--- ==========================================
--- BUILD UI — OXIDELIB (tanpa AddSection)
--- ==========================================
-
--- TABS
-local farmingTab = Window:AddTab({Name = "Farming", Icon = "swords"})
-local shinyTab = Window:AddTab({Name = "Shiny", Icon = "sparkles"})
-local espTab = Window:AddTab({Name = "ESP", Icon = "eye"})
-local bossTab = Window:AddTab({Name = "Boss", Icon = "sword"})
-local chestTab = Window:AddTab({Name = "Chest", Icon = "package"})
-local teleportTab = Window:AddTab({Name = "Teleport", Icon = "map-pin"})
-local rewardsTab = Window:AddTab({Name = "Rewards", Icon = "gift"})
-local miscTab = Window:AddTab({Name = "Misc", Icon = "wrench"})
-local uiSettingsTab = Window:AddTab({Name = "UI Settings", Icon = "settings-2"})
+-- ============================================================
+-- AKHIR BACKEND, MULAI UI OXIDELIB
+-- ============================================================
 
 -- ==========================================
--- TAB: FARMING
+-- TAB FARMING
 -- ==========================================
-farmingTab:AddLabel({Text = "Automation"})
+local TabFarming = Window:AddTab({ Name = "Farming", Icon = "swords" })
 
-farmToggle = farmingTab:AddToggle({
+-- SubTab: Main
+local SubFarmMain = TabFarming:AddSubTab("Main")
+
+SubFarmMain:AddSection("Automation")
+farmToggle = SubFarmMain:AddToggle({
     Name = "Auto Farm",
     Default = false,
     Callback = function(v)
@@ -1398,8 +1407,7 @@ farmToggle = farmingTab:AddToggle({
         validateConflicts("AutoFarm")
     end
 })
-
-cToggle = farmingTab:AddToggle({
+cToggle = SubFarmMain:AddToggle({
     Name = "Auto Catch",
     Default = false,
     Callback = function(v)
@@ -1407,8 +1415,7 @@ cToggle = farmingTab:AddToggle({
         validateConflicts("AutoCatch")
     end
 })
-
-lToggle = farmingTab:AddToggle({
+lToggle = SubFarmMain:AddToggle({
     Name = "Auto Leave",
     Default = false,
     Callback = function(v)
@@ -1416,8 +1423,7 @@ lToggle = farmingTab:AddToggle({
         validateConflicts("AutoLeave")
     end
 })
-
-tpToggle = farmingTab:AddToggle({
+tpToggle = SubFarmMain:AddToggle({
     Name = "Teleport Farm Mode",
     Default = false,
     Callback = function(v)
@@ -1425,8 +1431,7 @@ tpToggle = farmingTab:AddToggle({
         validateConflicts("TpFarm")
     end
 })
-
-noBallToggle = farmingTab:AddToggle({
+noBallToggle = SubFarmMain:AddToggle({
     Name = "Manual Catch (No Ball)",
     Default = false,
     Callback = function(v)
@@ -1434,8 +1439,7 @@ noBallToggle = farmingTab:AddToggle({
         validateConflicts("NoBall")
     end
 })
-
-farmingTab:AddToggle({
+SubFarmMain:AddToggle({
     Name = "Auto x2 Speed",
     Default = false,
     Callback = function(v)
@@ -1453,12 +1457,16 @@ farmingTab:AddToggle({
     end
 })
 
-farmingTab:AddDivider()
-
-farmingTab:AddLabel({Text = "Status"})
-
-local farmStatLbl = farmingTab:AddLabel({Text = "Farm: Idle"})
-local petStatLbl = farmingTab:AddLabel({Text = "Last Pet: —"})
+-- Status labels
+SubFarmMain:AddSection("Status")
+local farmStatLbl = SubFarmMain:AddParagraph({
+    Name = "Farm Status",
+    Content = "Farm: Idle"
+})
+local petStatLbl = SubFarmMain:AddParagraph({
+    Name = "Last Pet",
+    Content = "Last Pet: —"
+})
 
 task.spawn(function()
     while task.wait(1) do
@@ -1470,35 +1478,37 @@ task.spawn(function()
         elseif S.AutoFarm                 then state = "🏃 Walking Farm"
         elseif S.AutoCatch                then state = "🎯 Auto Catch"
         elseif S.AutoLeave                then state = "↩ Auto Leave" end
-        pcall(function() farmStatLbl:SetText("Farm: "..state) end)
-        if S.LastPetName then pcall(function() petStatLbl:SetText("Last Pet: "..S.LastPetName) end) end
+        pcall(function() farmStatLbl:SetContent("Farm: "..state) end)
+        if S.LastPetName then pcall(function() petStatLbl:SetContent("Last Pet: "..S.LastPetName) end) end
     end
 end)
 
-farmingTab:AddDivider()
+-- SubTab: Target Farm
+local SubTargetFarm = TabFarming:AddSubTab("Target Farm")
 
-farmingTab:AddLabel({Text = "Auto Farm (Selected)"})
-
-local targetRotationLabel = farmingTab:AddLabel({Text = "Rotation: (none)"})
+SubTargetFarm:AddSection("Target Selection")
+local targetRotationLabel = SubTargetFarm:AddParagraph({
+    Name = "Rotation",
+    Content = "Rotation: (none)"
+})
 
 local function updateTargetRotationLabel()
     if #S_SelectedConfigIds == 0 then
-        pcall(function() targetRotationLabel:SetText("Rotation: (none)") end)
+        pcall(function() targetRotationLabel:SetContent("Rotation: (none)") end)
         return
     end
     local names = {}
     for _, cid in ipairs(S_SelectedConfigIds) do
         table.insert(names, CONFIG_TO_DISPLAY[cid] or tostring(cid))
     end
-    pcall(function() targetRotationLabel:SetText("Rotation: " .. table.concat(names, " → ")) end)
+    pcall(function() targetRotationLabel:SetContent("Rotation: " .. table.concat(names, " → ")) end)
 end
 
-farmingTab:AddDropdown({
+SubTargetFarm:AddDropdown({
     Name = "Select Target Pet(s)",
     Options = PET_DROPDOWN_LIST,
-    Default = {},
+    Default = {},  -- Multi select default empty
     Multi = true,
-    Searchable = true,
     Callback = function(v)
         local selected = {}
         if type(v) == "table" then
@@ -1524,19 +1534,16 @@ farmingTab:AddDropdown({
     end
 })
 
-farmingTab:AddInput({
-    Name = "Next Pet Delay",
+SubTargetFarm:AddInput({
+    Name = "Next Pet Delay (s)",
     Default = "2.0",
-    Placeholder = "0.5 - 10",
-    Callback = function(text)
-        local val = tonumber(text)
-        if val then
-            S.TargetFarmNextDelay = val
-        end
+    Placeholder = "2.0",
+    Callback = function(t)
+        S.TargetFarmNextDelay = tonumber(t) or 2.0
     end
 })
 
-farmingTab:AddToggle({
+SubTargetFarm:AddToggle({
     Name = "Auto Farm (Selected)",
     Default = false,
     Callback = function(v)
@@ -1546,16 +1553,105 @@ farmingTab:AddToggle({
     end
 })
 
-farmingTab:AddDivider()
+-- SubTab: Skill Config
+local SubSkill = TabFarming:AddSubTab("Skill Config")
 
-farmingTab:AddLabel({Text = "Auto Release"})
+SubSkill:AddSection("Skill Queue")
+listSkilConfig = SubSkill:AddParagraph({
+    Name = "Skill List",
+    Content = "Skill List: (empty)"
+})
 
-farmingTab:AddDropdown({
+SubSkill:AddButton({
+    Name = "Add Skill 1",
+    Callback = function()
+        table.insert(SKILL_QUEUE, { slot=1 })
+        Window:Notify({ Title = "Skill Config", Content = "Skill 1 added to queue", Duration = 1.5, Type = "info" })
+        updateSkillConfigLabel()
+    end
+})
+SubSkill:AddButton({
+    Name = "Add Skill 2",
+    Callback = function()
+        table.insert(SKILL_QUEUE, { slot=2 })
+        Window:Notify({ Title = "Skill Config", Content = "Skill 2 added to queue", Duration = 1.5, Type = "info" })
+        updateSkillConfigLabel()
+    end
+})
+SubSkill:AddButton({
+    Name = "Add Skill 3",
+    Callback = function()
+        table.insert(SKILL_QUEUE, { slot=3 })
+        Window:Notify({ Title = "Skill Config", Content = "Skill 3 added to queue", Duration = 1.5, Type = "info" })
+        updateSkillConfigLabel()
+    end
+})
+SubSkill:AddButton({
+    Name = "Add Skill 4",
+    Callback = function()
+        table.insert(SKILL_QUEUE, { slot=4 })
+        Window:Notify({ Title = "Skill Config", Content = "Skill 4 added to queue", Duration = 1.5, Type = "info" })
+        updateSkillConfigLabel()
+    end
+})
+
+SubSkill:AddButton({
+    Name = "Clear Queue",
+    Callback = function()
+        SKILL_QUEUE = {}
+        skillQueueIdx = 1
+        updateSkillConfigLabel()
+        Window:Notify({ Title = "Skill Config", Content = "Queue cleared.", Duration = 1.5, Type = "info" })
+    end
+})
+
+SubSkill:AddSection("Delay Settings")
+SubSkill:AddInput({
+    Name = "Skill Delay (s) — Config Mode",
+    Default = "5.0",
+    Placeholder = "5.0",
+    Callback = function(v)
+        local val = tonumber(v) or 5.0
+        for i=1,4 do SKILL_SLOT_DELAY[i] = val end
+    end
+})
+SubSkill:AddInput({
+    Name = "Entry Delay (s)",
+    Default = "3.0",
+    Placeholder = "3.0",
+    Callback = function(v)
+        SKILL_ENTRY_DELAY = tonumber(v) or 3.0
+    end
+})
+
+SubSkill:AddToggle({
+    Name = "Auto Skill",
+    Default = false,
+    Callback = function(v) AUTO_SKILL_ENABLED = v end
+})
+SubSkill:AddToggle({
+    Name = "Use Skill Config",
+    Default = false,
+    Callback = function(v)
+        SKILL_CONFIG_ENABLED = v
+        skillQueueIdx = 1
+    end
+})
+
+SubSkill:AddParagraph({
+    Name = "Info",
+    Content = "Entry delay = delay before first skill."
+})
+
+-- SubTab: Auto Release
+local SubRelease = TabFarming:AddSubTab("Auto Release")
+
+SubRelease:AddSection("Grade Selection")
+SubRelease:AddDropdown({
     Name = "Select Grade",
     Options = {"D", "C", "B", "A", "S", "SSS"},
     Default = {},
     Multi = true,
-    Searchable = true,
     Callback = function(v)
         S_ReleaseSet = {}
         if type(v) == "table" then
@@ -1570,100 +1666,31 @@ farmingTab:AddDropdown({
     end
 })
 
-farmingTab:AddToggle({
+SubRelease:AddToggle({
     Name = "Auto Release",
     Default = false,
     Callback = function(v)
         S_AutoRelease = v
         if v and not next(S_ReleaseSet) then
-            Library:Notify({
+            Window:Notify({
                 Title = "⚠️ Auto Release",
-                Description = "Pilih grade yang mau di-release dulu.",
-                Duration = 4
+                Content = "Pilih grade yang mau di-release dulu.",
+                Duration = 4,
+                Type = "warning"
             })
         end
     end
 })
 
-farmingTab:AddDivider()
-
-farmingTab:AddLabel({Text = "Skill Configuration"})
-
-listSkilConfig = farmingTab:AddLabel({Text = "Skill List: (empty)"})
-
-local function makeSkillButton(slot, name)
-    farmingTab:AddButton({
-        Name = name,
-        Callback = function()
-            table.insert(SKILL_QUEUE, { slot=slot })
-            Library:Notify({
-                Title = "Skill Config",
-                Description = name.." → pos "..#SKILL_QUEUE,
-                Duration = 1.5
-            })
-            updateSkillConfigLabel()
-        end
-    })
-end
-
-makeSkillButton(1, "Add Skill 1")
-makeSkillButton(2, "Add Skill 2")
-makeSkillButton(3, "Add Skill 3")
-makeSkillButton(4, "Add Skill 4")
-
-farmingTab:AddInput({
-    Name = "Skill Delay (s) — Config Mode",
-    Default = "5.0",
-    Placeholder = "0.5 - 10",
-    Callback = function(text)
-        local val = tonumber(text)
-        if val then
-            for i=1,4 do SKILL_SLOT_DELAY[i] = val end
-        end
-    end
-})
-
-farmingTab:AddInput({
-    Name = "Entry Delay (s)",
-    Default = "3.0",
-    Placeholder = "0.5 - 10",
-    Callback = function(text)
-        local val = tonumber(text)
-        if val then SKILL_ENTRY_DELAY = val end
-    end
-})
-
-farmingTab:AddButton({
-    Name = "Clear Queue",
-    Callback = function()
-        SKILL_QUEUE={} skillQueueIdx=1 updateSkillConfigLabel()
-        Library:Notify({ Title="Skill Config", Description="Queue cleared.", Duration=1.5 })
-    end
-})
-
-farmingTab:AddToggle({
-    Name = "Auto Skill",
-    Default = false,
-    Callback = function(v) AUTO_SKILL_ENABLED = v end
-})
-
-farmingTab:AddToggle({
-    Name = "Use Skill Config",
-    Default = false,
-    Callback = function(v)
-        SKILL_CONFIG_ENABLED = v
-        skillQueueIdx = 1
-    end
-})
-
-farmingTab:AddLabel({Text = "Info: Entry delay = delay before first skill."})
-
 -- ==========================================
--- TAB: SHINY
+-- TAB SHINY
 -- ==========================================
-shinyTab:AddLabel({Text = "Detection Modes"})
+local TabShiny = Window:AddTab({ Name = "Shiny", Icon = "sparkles" })
 
-shinyTab:AddToggle({
+local SubShinyDetect = TabShiny:AddSubTab("Detection")
+
+SubShinyDetect:AddSection("Modes")
+SubShinyDetect:AddToggle({
     Name = "Show Pity Overlay",
     Default = false,
     Callback = function(v)
@@ -1672,7 +1699,7 @@ shinyTab:AddToggle({
     end
 })
 
-shinyOnlyToggle_ref = shinyTab:AddToggle({
+shinyOnlyToggle_ref = SubShinyDetect:AddToggle({
     Name = "Catch Shiny Only",
     Default = false,
     Callback = function(v)
@@ -1690,7 +1717,7 @@ shinyOnlyToggle_ref = shinyTab:AddToggle({
     end
 })
 
-shinyPrisToggle_ref = shinyTab:AddToggle({
+shinyPrisToggle_ref = SubShinyDetect:AddToggle({
     Name = "Catch Shiny & Prismatic",
     Default = false,
     Callback = function(v)
@@ -1709,11 +1736,8 @@ shinyPrisToggle_ref = shinyTab:AddToggle({
     end
 })
 
-shinyTab:AddDivider()
-
-shinyTab:AddLabel({Text = "Auto Stop Catch"})
-
-shinyTab:AddToggle({
+SubShinyDetect:AddSection("Auto Stop")
+SubShinyDetect:AddToggle({
     Name = "Auto Stop on Shiny",
     Default = false,
     Callback = function(v)
@@ -1726,8 +1750,7 @@ shinyTab:AddToggle({
         end
     end
 })
-
-shinyTab:AddToggle({
+SubShinyDetect:AddToggle({
     Name = "Auto Stop on Prismatic",
     Default = false,
     Callback = function(v)
@@ -1741,63 +1764,60 @@ shinyTab:AddToggle({
     end
 })
 
-shinyTab:AddDivider()
-
-shinyTab:AddLabel({Text = "Ball on Detect"})
-
+-- SubTab: Ball Settings
+local SubBall = TabShiny:AddSubTab("Ball Settings")
 local BALL_OPTIONS = { "None", "King Ball", "Advanced Ball", "Prismatic Ball" }
 
-local function applyBallSelection(v)
-    S.AutoKingBall  = (v == "King Ball")
-    S.AutoAdvBall   = (v == "Advanced Ball")
-    S.AutoPrismBall = (v == "Prismatic Ball")
-    if v ~= "None" and S.NoBall then
-        S.NoBall = false
-        if noBallToggle then pcall(function() noBallToggle:SetValue(false) end) end
-        Library:Notify({
-            Title = "⚠️ Konflik Toggle",
-            Description = "No Ball dimatiin — ball dipilih dari dropdown.",
-            Duration = 3
-        })
-    end
-end
-
-local function applyPrisBallSelection(v)
-    S.PrisAutoKingBall  = (v == "King Ball")
-    S.PrisAutoAdvBall   = (v == "Advanced Ball")
-    S.PrisAutoPrismBall = (v == "Prismatic Ball")
-    if v ~= "None" and S.NoBall then
-        S.NoBall = false
-        if noBallToggle then pcall(function() noBallToggle:SetValue(false) end) end
-        Library:Notify({
-            Title = "⚠️ Konflik Toggle",
-            Description = "No Ball dimatiin — ball dipilih dari dropdown.",
-            Duration = 3
-        })
-    end
-end
-
-ballDropdown = shinyTab:AddDropdown({
+SubBall:AddSection("Shiny Ball")
+ballDropdown = SubBall:AddDropdown({
     Name = "Shiny Ball",
     Options = BALL_OPTIONS,
     Default = "None",
-    Searchable = true,
-    Callback = applyBallSelection
+    Callback = function(v)
+        S.AutoKingBall  = (v == "King Ball")
+        S.AutoAdvBall   = (v == "Advanced Ball")
+        S.AutoPrismBall = (v == "Prismatic Ball")
+        if v ~= "None" and S.NoBall then
+            S.NoBall = false
+            if noBallToggle then pcall(function() noBallToggle:SetValue(false) end) end
+            Window:Notify({
+                Title = "⚠️ Konflik Toggle",
+                Content = "No Ball dimatiin — ball dipilih dari dropdown.",
+                Duration = 3,
+                Type = "warning"
+            })
+        end
+    end
 })
 
-prisBallDropdown = shinyTab:AddDropdown({
+SubBall:AddSection("Prismatic Ball")
+prisBallDropdown = SubBall:AddDropdown({
     Name = "Prismatic Ball",
     Options = BALL_OPTIONS,
     Default = "None",
-    Searchable = true,
-    Callback = applyPrisBallSelection
+    Callback = function(v)
+        S.PrisAutoKingBall  = (v == "King Ball")
+        S.PrisAutoAdvBall   = (v == "Advanced Ball")
+        S.PrisAutoPrismBall = (v == "Prismatic Ball")
+        if v ~= "None" and S.NoBall then
+            S.NoBall = false
+            if noBallToggle then pcall(function() noBallToggle:SetValue(false) end) end
+            Window:Notify({
+                Title = "⚠️ Konflik Toggle",
+                Content = "No Ball dimatiin — ball dipilih dari dropdown.",
+                Duration = 3,
+                Type = "warning"
+            })
+        end
+    end
 })
 
-shinyTab:AddDivider()
-
-shinyTab:AddLabel({Text = "Pity Counter"})
-
-local pityDisplayLbl = shinyTab:AddLabel({Text = "💎 Prismatic: —/—\n✨ Shiny: —/—"})
+-- SubTab: Pity Counter
+local SubPity = TabShiny:AddSubTab("Pity Counter")
+local pityDisplayLbl = SubPity:AddParagraph({
+    Name = "Pity Info",
+    Content = "💎 Prismatic: —/—\n✨ Shiny: —/—"
+})
 
 task.spawn(function()
     while task.wait(1) do
@@ -1806,16 +1826,18 @@ task.spawn(function()
         local prisText  = (cur and max) and string.format("💎 Prismatic: %d/%d%s", cur, max, cur>=(max-1) and " ⚠️" or "") or "💎 Prismatic: —/—"
         local sc, sm    = getShinyPityInfo()
         local shinyText = (sc and sm) and string.format("✨ Shiny: %d/%d%s", sc, sm, sc>=sm and " ⚠️" or "") or "✨ Shiny: —/—"
-        pcall(function() pityDisplayLbl:SetText(prisText.."\n"..shinyText) end)
+        pcall(function() pityDisplayLbl:SetContent(prisText.."\n"..shinyText) end)
     end
 end)
 
 -- ==========================================
--- TAB: ESP
+-- TAB ESP
 -- ==========================================
-espTab:AddLabel({Text = "Player ESP"})
+local TabESP = Window:AddTab({ Name = "ESP", Icon = "eye" })
+local SubESP = TabESP:AddSubTab("Player ESP")
 
-espTab:AddToggle({
+SubESP:AddSection("ESP")
+SubESP:AddToggle({
     Name = "Player Highlight + Name + Distance",
     Default = false,
     Callback = function(v)
@@ -1826,46 +1848,50 @@ espTab:AddToggle({
         end
     end
 })
-
-espTab:AddLabel({Text = "Blue highlight + name + distance (meters) realtime."})
+SubESP:AddParagraph({
+    Name = "Info",
+    Content = "Blue highlight + name + distance (meters) realtime."
+})
 
 -- ==========================================
--- TAB: BOSS
+-- TAB BOSS
 -- ==========================================
-bossTab:AddLabel({Text = "Boss Farm"})
+local TabBoss = Window:AddTab({ Name = "Boss", Icon = "sword" })
+local SubBoss = TabBoss:AddSubTab("Boss Farm")
 
-bossTab:AddDropdown({
+SubBoss:AddSection("Boss Selection")
+SubBoss:AddDropdown({
     Name = "Select Boss",
     Options = bossNames,
     Default = bossNames[1],
-    Searchable = true,
     Callback = function(v) selBoss = bossMap[v] end
 })
 
-bossTab:AddButton({
+SubBoss:AddSection("Battle")
+SubBoss:AddButton({
     Name = "Enter Battle (1x)",
     Callback = function()
         if not selBoss then
-            Library:Notify({ Title="Boss", Description="Select a boss first!", Duration=2 })
+            Window:Notify({ Title = "Boss", Content = "Select a boss first!", Duration = 2, Type = "warning" })
             return
         end
         if S_BossLoop then
-            Library:Notify({ Title="Boss", Description="Turn off Loop for manual 1x.", Duration=2 })
+            Window:Notify({ Title = "Boss", Content = "Turn off Loop for manual 1x.", Duration = 2, Type = "warning" })
             return
         end
         if not _G.NR_petUID then
-            Library:Notify({ Title="Boss", Description="No Pet UID!", Duration=3 })
+            Window:Notify({ Title = "Boss", Content = "No Pet UID!", Duration = 3, Type = "warning" })
             return
         end
         task.spawn(function()
-            Library:Notify({ Title="Boss", Description="Entering "..selBoss.name.."...", Duration=2 })
+            Window:Notify({ Title = "Boss", Content = "Entering "..selBoss.name.."...", Duration = 2, Type = "info" })
             local ok = doEnterBattle(selBoss)
-            Library:Notify({ Title="Boss", Description=ok and (selBoss.name.." done!") or "Battle failed.", Duration=2 })
+            Window:Notify({ Title = "Boss", Content = ok and (selBoss.name.." done!") or "Battle failed.", Duration = 2, Type = ok and "success" or "error" })
         end)
     end
 })
 
-bossTab:AddToggle({
+SubBoss:AddToggle({
     Name = "Auto Boss Battle",
     Default = false,
     Callback = function(v)
@@ -1875,24 +1901,26 @@ bossTab:AddToggle({
 })
 
 -- ==========================================
--- TAB: CHEST
+-- TAB CHEST
 -- ==========================================
-chestTab:AddLabel({Text = "Chest Farm"})
+local TabChest = Window:AddTab({ Name = "Chest", Icon = "package" })
+local SubChest = TabChest:AddSubTab("Chest Farm")
 
-chestTab:AddToggle({
+SubChest:AddSection("Farm")
+SubChest:AddToggle({
     Name = "Auto Farm Chest",
     Default = false,
     Callback = function(v) S.ChestFarm = v end
 })
 
-chestTab:AddButton({
+SubChest:AddButton({
     Name = "Next Chest (Manual)",
     Callback = function()
         local rc  = workspace:FindFirstChild("RuntimeCache")
         local rcc = rc  and rc:FindFirstChild("RuntimeCacheClient")
         local dir = rcc and rcc:FindFirstChild("Chest")
         if not dir then
-            Library:Notify({ Title="Chest", Description="No chest folder found.", Duration=2 })
+            Window:Notify({ Title = "Chest", Content = "No chest folder found.", Duration = 2, Type = "warning" })
             return
         end
         local list = {}
@@ -1907,43 +1935,46 @@ chestTab:AddButton({
     end
 })
 
-chestTab:AddButton({
+SubChest:AddSection("Claim")
+SubChest:AddButton({
     Name = "Claim All Chests (Now)",
     Callback = function()
         task.spawn(function()
-            Library:Notify({ Title="Chest", Description="Claiming all chests...", Duration=2 })
+            Window:Notify({ Title = "Chest", Content = "Claiming all chests...", Duration = 2, Type = "info" })
             local n = claimAllChests()
-            Library:Notify({ Title="Chest", Description=string.format("Claimed %d chest(s)!", n), Duration=3 })
+            Window:Notify({ Title = "Chest", Content = string.format("Claimed %d chest(s)!", n), Duration = 3, Type = "success" })
         end)
     end
 })
 
-chestTab:AddToggle({
+SubChest:AddToggle({
     Name = "Auto Claim All Chests",
     Default = false,
     Callback = function(v) S_AutoChestClaim = v end
 })
 
-chestTab:AddInput({
+SubChest:AddInput({
     Name = "Claim Cycle Delay (s)",
     Default = "4",
-    Placeholder = "1 - 30",
-    Callback = function(text)
-        local val = tonumber(text)
-        if val then CHEST_CLAIM_CYCLE = val end
+    Placeholder = "4",
+    Callback = function(v)
+        CHEST_CLAIM_CYCLE = tonumber(v) or 4
     end
 })
 
 -- ==========================================
--- TAB: TELEPORT
+-- TAB TELEPORT
 -- ==========================================
-teleportTab:AddLabel({Text = "Teleport to Player"})
+local TabTeleport = Window:AddTab({ Name = "Teleport", Icon = "map-pin" })
 
-teleportTab:AddDropdown({
+-- SubTab: Player TP
+local SubTelePlayer = TabTeleport:AddSubTab("To Player")
+
+SubTelePlayer:AddSection("Teleport to Player")
+SubTelePlayer:AddDropdown({
     Name = "Select Player",
     Options = {},
     Default = nil,
-    Searchable = true,
     Callback = function(v) selPlayer = v end,
     OptionsProvider = function()
         local names = {}
@@ -1953,11 +1984,11 @@ teleportTab:AddDropdown({
     end
 })
 
-teleportTab:AddButton({
+SubTelePlayer:AddButton({
     Name = "Teleport to Player",
     Callback = function()
         if not selPlayer or selPlayer=="(No players)" then
-            Library:Notify({ Title="Teleport", Description="No player selected!", Duration=2 })
+            Window:Notify({ Title = "Teleport", Content = "No player selected!", Duration = 2, Type = "warning" })
             return
         end
         local tgt  = Svc.Players:FindFirstChild(selPlayer)
@@ -1968,15 +1999,14 @@ teleportTab:AddButton({
             local tr = tc and tc:FindFirstChild("HumanoidRootPart")
             if tr then
                 root.CFrame = tr.CFrame * CFrame.new(0,0,3)
-                Library:Notify({ Title="Teleport", Description="Teleported to "..selPlayer, Duration=2 })
+                Window:Notify({ Title = "Teleport", Content = "Teleported to "..selPlayer, Duration = 2, Type = "success" })
             end
         end
     end
 })
 
-teleportTab:AddDivider()
-
-teleportTab:AddLabel({Text = "Teleport to Island"})
+-- SubTab: Island TP
+local SubTeleIsland = TabTeleport:AddSubTab("To Island")
 
 local IslandConfig = (function()
     local ok, cfg = pcall(function()
@@ -2002,64 +2032,70 @@ end
 
 local selIsland = islandDisplayNames[1] or nil
 
+SubTeleIsland:AddSection("Select Island")
 if #islandDisplayNames==0 then
-    teleportTab:AddLabel({Text = "⚠️ No islands found in scene."})
+    SubTeleIsland:AddParagraph({
+        Name = "Warning",
+        Content = "⚠️ No islands found in scene."
+    })
 else
-    teleportTab:AddDropdown({
+    SubTeleIsland:AddDropdown({
         Name = "Select Island",
         Options = islandDisplayNames,
         Default = islandDisplayNames[1],
-        Searchable = true,
         Callback = function(v) selIsland = v end
     })
-    
-    teleportTab:AddButton({
+    SubTeleIsland:AddButton({
         Name = "Teleport to Island",
         Callback = function()
             if not selIsland then
-                Library:Notify({ Title="Island TP", Description="Select an island first!", Duration=2 })
+                Window:Notify({ Title = "Island TP", Content = "Select an island first!", Duration = 2, Type = "warning" })
                 return
             end
             local assetName = islandAssetByDisplay[selIsland]
             if not assetName then
-                Library:Notify({ Title="Island TP", Description="Asset not mapped: "..selIsland, Duration=3 })
+                Window:Notify({ Title = "Island TP", Content = "Asset not mapped: "..selIsland, Duration = 3, Type = "error" })
                 return
             end
             local folder = workspace:FindFirstChild("Scene") and workspace.Scene:FindFirstChild("Island")
             if not folder then
-                Library:Notify({ Title="Island TP", Description="workspace.Scene.Island missing.", Duration=3 })
+                Window:Notify({ Title = "Island TP", Content = "workspace.Scene.Island missing.", Duration = 3, Type = "error" })
                 return
             end
             local targetModel = folder:FindFirstChild(assetName)
             if not targetModel then
-                Library:Notify({ Title="Island TP", Description=assetName.." unloaded — rejoin.", Duration=4 })
+                Window:Notify({ Title = "Island TP", Content = assetName.." unloaded — rejoin.", Duration = 4, Type = "error" })
                 return
             end
             local landPart = targetModel:FindFirstChildWhichIsA("BasePart", true)
             if not landPart then
-                Library:Notify({ Title="Island TP", Description="No BasePart in "..assetName, Duration=2 })
+                Window:Notify({ Title = "Island TP", Content = "No BasePart in "..assetName, Duration = 2, Type = "error" })
                 return
             end
             local char = plr.Character
             local root = char and char:FindFirstChild("HumanoidRootPart")
             if not root then
-                Library:Notify({ Title="Island TP", Description="Character not ready.", Duration=2 })
+                Window:Notify({ Title = "Island TP", Content = "Character not ready.", Duration = 2, Type = "error" })
                 return
             end
             root.CFrame = CFrame.new(landPart.Position + Vector3.new(0,5,0))
-            Library:Notify({ Title="Island TP", Description="Teleported to "..selIsland.." ("..assetName..")", Duration=3 })
+            Window:Notify({ Title = "Island TP", Content = "Teleported to "..selIsland.." ("..assetName..")", Duration = 3, Type = "success" })
         end
     })
-    
-    teleportTab:AddLabel({Text = string.format("%d island(s) available.", #islandDisplayNames)})
+    SubTeleIsland:AddParagraph({
+        Name = "Info",
+        Content = string.format("%d island(s) available.", #islandDisplayNames)
+    })
 end
 
 -- ==========================================
--- TAB: REWARDS
+-- TAB REWARDS
 -- ==========================================
-rewardsTab:AddLabel({Text = "Claim Rewards"})
+local TabRewards = Window:AddTab({ Name = "Rewards", Icon = "gift" })
+local SubRewards = TabRewards:AddSubTab("Claim")
 
-rewardsTab:AddButton({
+SubRewards:AddSection("Daily & Achievements")
+SubRewards:AddButton({
     Name = "Claim All Daily Quest",
     Callback = function()
         local remote = game:GetService("ReplicatedStorage")
@@ -2071,11 +2107,11 @@ rewardsTab:AddButton({
             if ok then claimed += 1 end
             task.wait(0.2)
         end
-        Library:Notify({ Title="Daily Quest", Description=string.format("Claimed %d/8 quest(s)!", claimed), Duration=3 })
+        Window:Notify({ Title = "Daily Quest", Content = string.format("Claimed %d/8 quest(s)!", claimed), Duration = 3, Type = "success" })
     end
 })
 
-rewardsTab:AddButton({
+SubRewards:AddButton({
     Name = "Claim All Achievement",
     Callback = function()
         local remote = game:GetService("ReplicatedStorage")
@@ -2087,11 +2123,11 @@ rewardsTab:AddButton({
             if ok then claimed += 1 end
             task.wait(0.2)
         end
-        Library:Notify({ Title="Achievement", Description=string.format("Claimed %d/28 achievement(s)!", claimed), Duration=3 })
+        Window:Notify({ Title = "Achievement", Content = string.format("Claimed %d/28 achievement(s)!", claimed), Duration = 3, Type = "success" })
     end
 })
 
-rewardsTab:AddButton({
+SubRewards:AddButton({
     Name = "Claim All BattlePass",
     Callback = function()
         local remote = game:GetService("ReplicatedStorage")
@@ -2104,11 +2140,11 @@ rewardsTab:AddButton({
             if ok then claimed += 1 end
             task.wait(0.2)
         end
-        Library:Notify({ Title="Battle Pass", Description=string.format("Claimed %d/%d reward(s)!", claimed, TOTAL_TIERS), Duration=3 })
+        Window:Notify({ Title = "Battle Pass", Content = string.format("Claimed %d/%d reward(s)!", claimed, TOTAL_TIERS), Duration = 3, Type = "success" })
     end
 })
 
-rewardsTab:AddButton({
+SubRewards:AddButton({
     Name = "Claim All LevelReward",
     Callback = function()
         local remote = game:GetService("ReplicatedStorage")
@@ -2119,34 +2155,36 @@ rewardsTab:AddButton({
             if ok then claimed += 1 end
             task.wait(0.2)
         end
-        Library:Notify({ Title="Level Reward", Description=string.format("Claimed %d/70 reward(s)!", claimed), Duration=3 })
+        Window:Notify({ Title = "Level Reward", Content = string.format("Claimed %d/70 reward(s)!", claimed), Duration = 3, Type = "success" })
     end
 })
 
 -- ==========================================
--- TAB: MISC
+-- TAB MISC
 -- ==========================================
-miscTab:AddLabel({Text = "Player"})
+local TabMisc = Window:AddTab({ Name = "Misc", Icon = "wrench" })
 
-miscTab:AddToggle({
+-- SubTab: Player
+local SubMiscPlayer = TabMisc:AddSubTab("Player")
+
+SubMiscPlayer:AddSection("Player Settings")
+SubMiscPlayer:AddToggle({
     Name = "Anti AFK",
     Default = false,
     Callback = function(v) setAntiAFK(v) end
 })
-
-miscTab:AddToggle({
+SubMiscPlayer:AddToggle({
     Name = "Infinite Jump",
     Default = false,
     Callback = function(v) setInfiniteJump(v) end
 })
-
-miscTab:AddToggle({
+SubMiscPlayer:AddToggle({
     Name = "Noclip",
     Default = false,
     Callback = function(v) setNoclip(v) end
 })
 
-miscTab:AddToggle({
+SubMiscPlayer:AddToggle({
     Name = "WalkSpeed Override",
     Default = false,
     Callback = function(v)
@@ -2154,21 +2192,17 @@ miscTab:AddToggle({
         if v then applySpeed(MiscS.SpeedValue) else applySpeed(16) end
     end
 })
-
-miscTab:AddInput({
+SubMiscPlayer:AddInput({
     Name = "WalkSpeed",
     Default = "16",
-    Placeholder = "2 - 500",
-    Callback = function(text)
-        local val = tonumber(text)
-        if val then
-            MiscS.SpeedValue = val
-            if MiscS.SpeedEnabled then applySpeed(val) end
-        end
+    Placeholder = "16",
+    Callback = function(v)
+        MiscS.SpeedValue = tonumber(v) or 16
+        if MiscS.SpeedEnabled then applySpeed(MiscS.SpeedValue) end
     end
 })
 
-miscTab:AddToggle({
+SubMiscPlayer:AddToggle({
     Name = "JumpPower Override",
     Default = false,
     Callback = function(v)
@@ -2176,21 +2210,17 @@ miscTab:AddToggle({
         if v then applyJump(MiscS.JumpValue) else applyJump(50) end
     end
 })
-
-miscTab:AddInput({
+SubMiscPlayer:AddInput({
     Name = "JumpPower",
     Default = "50",
-    Placeholder = "10 - 500",
-    Callback = function(text)
-        local val = tonumber(text)
-        if val then
-            MiscS.JumpValue = val
-            if MiscS.JumpEnabled then applyJump(val) end
-        end
+    Placeholder = "50",
+    Callback = function(v)
+        MiscS.JumpValue = tonumber(v) or 50
+        if MiscS.JumpEnabled then applyJump(MiscS.JumpValue) end
     end
 })
 
-miscTab:AddToggle({
+SubMiscPlayer:AddToggle({
     Name = "Custom Gravity",
     Default = false,
     Callback = function(v)
@@ -2198,31 +2228,26 @@ miscTab:AddToggle({
         if v then applyGravity(MiscS.GravityValue) else applyGravity(196.2) end
     end
 })
-
-miscTab:AddInput({
+SubMiscPlayer:AddInput({
     Name = "Gravity",
     Default = "196",
-    Placeholder = "0 - 500",
-    Callback = function(text)
-        local val = tonumber(text)
-        if val then
-            MiscS.GravityValue = val
-            if MiscS.GravityEnabled then applyGravity(val) end
-        end
+    Placeholder = "196",
+    Callback = function(v)
+        MiscS.GravityValue = tonumber(v) or 196
+        if MiscS.GravityEnabled then applyGravity(MiscS.GravityValue) end
     end
 })
 
-miscTab:AddDivider()
+-- SubTab: World
+local SubMiscWorld = TabMisc:AddSubTab("World")
 
-miscTab:AddLabel({Text = "World"})
-
-miscTab:AddToggle({
+SubMiscWorld:AddSection("World Settings")
+SubMiscWorld:AddToggle({
     Name = "Fullbright",
     Default = false,
     Callback = function(v) setFullBright(v) end
 })
-
-miscTab:AddToggle({
+SubMiscWorld:AddToggle({
     Name = "No Fog",
     Default = false,
     Callback = function(v)
@@ -2230,8 +2255,7 @@ miscTab:AddToggle({
         if v then applyFog(1e9) else applyFog(_origLighting.FogEnd) end
     end
 })
-
-miscTab:AddToggle({
+SubMiscWorld:AddToggle({
     Name = "Time of Day Override",
     Default = false,
     Callback = function(v)
@@ -2239,49 +2263,41 @@ miscTab:AddToggle({
         if not v then applyTime(_origLighting.ClockTime) end
     end
 })
-
-miscTab:AddInput({
+SubMiscWorld:AddInput({
     Name = "Clock Time (0–24)",
     Default = "14",
-    Placeholder = "0 - 24",
-    Callback = function(text)
-        local val = tonumber(text)
-        if val then
-            MiscS.TimeValue = val
-            if MiscS.TimeEnabled then applyTime(val) end
-        end
+    Placeholder = "14",
+    Callback = function(v)
+        MiscS.TimeValue = tonumber(v) or 14
+        if MiscS.TimeEnabled then applyTime(MiscS.TimeValue) end
     end
 })
 
-miscTab:AddDivider()
+-- SubTab: Anti Lag
+local SubMiscAntiLag = TabMisc:AddSubTab("Anti Lag")
 
-miscTab:AddLabel({Text = "Anti Lag"})
-
-miscTab:AddToggle({
+SubMiscAntiLag:AddSection("Preset & Options")
+SubMiscAntiLag:AddToggle({
     Name = "Anti Lag (Preset — all below)",
     Default = false,
     Callback = function(v) applyAntiLagPreset(v) end
 })
-
-miscTab:AddToggle({
+SubMiscAntiLag:AddToggle({
     Name = "Kill Shadows",
     Default = false,
     Callback = function(v) setShadows(v) end
 })
-
-miscTab:AddToggle({
+SubMiscAntiLag:AddToggle({
     Name = "Kill Particles / Fire / Smoke",
     Default = false,
     Callback = function(v) killParticles(v) end
 })
-
-miscTab:AddToggle({
+SubMiscAntiLag:AddToggle({
     Name = "Low Textures + Mesh LOD",
     Default = false,
     Callback = function(v) setLowTextures(v) end
 })
-
-miscTab:AddToggle({
+SubMiscAntiLag:AddToggle({
     Name = "Frame Rate Cap",
     Default = false,
     Callback = function(v)
@@ -2289,37 +2305,32 @@ miscTab:AddToggle({
         setFPSCap(v, AntiLagS.FPSCapValue)
     end
 })
-
-miscTab:AddInput({
+SubMiscAntiLag:AddInput({
     Name = "FPS Cap Value",
     Default = "60",
-    Placeholder = "15 - 240",
-    Callback = function(text)
-        local val = tonumber(text)
-        if val then
-            AntiLagS.FPSCapValue = val
-            if AntiLagS.FPSCapEnabled then setFPSCap(true, val) end
-        end
+    Placeholder = "60",
+    Callback = function(v)
+        AntiLagS.FPSCapValue = tonumber(v) or 60
+        if AntiLagS.FPSCapEnabled then setFPSCap(true, AntiLagS.FPSCapValue) end
     end
 })
 
-miscTab:AddDivider()
+-- SubTab: Session
+local SubMiscSession = TabMisc:AddSubTab("Session")
 
-miscTab:AddLabel({Text = "Session"})
-
-miscTab:AddButton({
+SubMiscSession:AddSection("Server")
+SubMiscSession:AddButton({
     Name = "Rejoin Server",
     Callback = function()
-        Library:Notify({ Title="Session", Description="Rejoining...", Duration=2 })
+        Window:Notify({ Title = "Session", Content = "Rejoining...", Duration = 2, Type = "info" })
         task.wait(1)
         Svc.Teleport:Teleport(game.PlaceId, plr)
     end
 })
-
-miscTab:AddButton({
+SubMiscSession:AddButton({
     Name = "Server Hop",
     Callback = function()
-        Library:Notify({ Title="Session", Description="Looking for server...", Duration=2 })
+        Window:Notify({ Title = "Session", Content = "Looking for server...", Duration = 2, Type = "info" })
         task.spawn(function()
             pcall(function()
                 local servers = {}
@@ -2334,81 +2345,46 @@ miscTab:AddButton({
         end)
     end
 })
-
-miscTab:AddButton({
+SubMiscSession:AddButton({
     Name = "Copy UserID",
     Callback = function()
         pcall(function() setclipboard(tostring(plr.UserId)) end)
-        Library:Notify({ Title="Misc", Description="UserID copied: "..plr.UserId, Duration=2 })
+        Window:Notify({ Title = "Misc", Content = "UserID copied: "..plr.UserId, Duration = 2, Type = "info" })
     end
 })
-
-miscTab:AddButton({
+SubMiscSession:AddButton({
     Name = "Copy PlaceID",
     Callback = function()
         pcall(function() setclipboard(tostring(game.PlaceId)) end)
-        Library:Notify({ Title="Misc", Description="PlaceID copied: "..game.PlaceId, Duration=2 })
+        Window:Notify({ Title = "Misc", Content = "PlaceID copied: "..game.PlaceId, Duration = 2, Type = "info" })
     end
 })
 
 -- ==========================================
--- TAB: UI SETTINGS
+-- TAB SETTINGS (UI)
 -- ==========================================
-uiSettingsTab:AddLabel({Text = "Menu"})
+local TabSettings = Window:AddTab({ Name = "Settings", Icon = "settings-2" })
+local SubSettings = TabSettings:AddSubTab("UI")
 
-uiSettingsTab:AddToggle({
-    Name = "Custom Cursor",
-    Default = true,
-    Callback = function(v) Library.ShowCustomCursor = v end
+SubSettings:AddSection("Menu")
+SubSettings:AddKeybind({
+    Name = "Toggle Menu Key",
+    Default = Enum.KeyCode.RightShift,
+    Callback = function(key) Window.ToggleKey = key end
 })
-
-uiSettingsTab:AddDropdown({
-    Name = "Notification Side",
-    Options = {"Left","Right"},
-    Default = "Right",
-    Searchable = true,
-    Callback = function(v) Library:SetNotifySide(v) end
-})
-
-uiSettingsTab:AddDropdown({
-    Name = "DPI Scale",
-    Options = {"50%","75%","85%","100%","125%","150%"},
-    Default = "85%",
-    Searchable = true,
-    Callback = function(v)
-        v = v:gsub("%%","")
-        Library:SetDPIScale(tonumber(v))
-    end
-})
-
-uiSettingsTab:AddToggle({
-    Name = "Glow AccentBar",
-    Default = true,
-    Callback = function(v) Window:SetHeaderGlow(v) end
-})
-
-uiSettingsTab:AddToggle({
-    Name = "Show Profile",
-    Default = true,
-    Callback = function(v) Window:SetProfileVisible(v) end
-})
-
-uiSettingsTab:AddDivider()
-
-uiSettingsTab:AddLabel({Text = "Menu bind"})
-
-uiSettingsTab:AddButton({
-    Name = "Unload script",
-    Callback = function() Library:Unload() end
+SubSettings:AddParagraph({
+    Name = "Info",
+    Content = "Use K to toggle Ping/FPS counter (if supported)."
 })
 
 -- ==========================================
--- INIT NOTIFICATION
+-- NOTIFIKASI AWAL
 -- ==========================================
-Library:Notify({
-    Title = "Wisnu Hub Evomon v3",
-    Description = "Loaded! RightShift to toggle.",
-    Duration = 4
+Window:Notify({
+    Title = "Wisnu Hub Evomon v3 (Oxidelib)",
+    Content = "Loaded! RightShift to toggle.",
+    Duration = 4,
+    Type = "success"
 })
 
-print("⚡ J4rzz Evomon v3 — Oxidelib UI Loaded!")
+print("⚡ WISNU HUB EVOMON v3 — OXIDELIB PORT SUCCESS!")
