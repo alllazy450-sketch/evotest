@@ -2223,9 +2223,23 @@ UnlockSub:AddToggle({
 })
 
 -- ==========================================
--- FUNGSI-FUNGSI SETUP TAMBAHAN
+-- PERBAIKAN SAFETY CHECK UNTUK REMOTE
 -- ==========================================
--- (Fungsi-fungsi seperti _ZX_SetupSingularity, _ZX_SetupLookAtBall, dll sudah didefinisikan di backend)
+-- Fungsi untuk memanggil remote dengan aman
+local function safeFireServer(remote, ...)
+    if remote and type(remote.FireServer) == "function" then
+        pcall(function() remote:FireServer(...) end)
+        return true
+    end
+    return false
+end
+
+local function safeInvokeServer(remote, ...)
+    if remote and type(remote.InvokeServer) == "function" then
+        return pcall(function() return remote:InvokeServer(...) end)
+    end
+    return false, "Remote not available"
+end
 
 -- ==========================================
 -- NOTIFIKASI AWAL
