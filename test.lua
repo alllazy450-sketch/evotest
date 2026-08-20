@@ -584,19 +584,20 @@ MainSub:AddSlider({
     end
 })
 
-MainSub:AddCheckbox({
+-- AddCheckbox → AddToggle
+MainSub:AddToggle({
     Name = "Cooldown Protection",
     Default = false,
     Callback = function(state) getgenv().CooldownProtection = state end
 })
 
-MainSub:AddCheckbox({
+MainSub:AddToggle({
     Name = "Auto Ability",
     Default = false,
     Callback = function(state) getgenv().AutoAbility = state end
 })
 
-MainSub:AddCheckbox({
+MainSub:AddToggle({
     Name = "Auto Pre-Click",
     Default = false,
     Callback = function(state)
@@ -650,7 +651,7 @@ MainSub:AddCheckbox({
     end
 })
 
-MainSub:AddCheckbox({
+MainSub:AddToggle({
     Name = "Notify",
     Default = false,
     Callback = function(state) getgenv().AutoParryNotify = state end
@@ -658,7 +659,7 @@ MainSub:AddCheckbox({
 
 -- Humanizer Module
 MainSub:AddSection("Humanizer")
-MainSub:AddCheckbox({
+MainSub:AddToggle({
     Name = "Humanizer",
     Default = false,
     Callback = function(state)
@@ -700,7 +701,7 @@ MainSub:AddToggle({
         end
     end
 })
-MainSub:AddCheckbox({
+MainSub:AddToggle({
     Name = "Notify",
     Default = false,
     Callback = function(state) getgenv().TriggerbotNotify = state end
@@ -953,7 +954,7 @@ BlatantSub:AddToggle({
         end
     end
 })
-BlatantSub:AddCheckbox({
+BlatantSub:AddToggle({
     Name = "Thunder Dash No Cooldown",
     Default = false,
     Callback = function(value)
@@ -1006,7 +1007,7 @@ SpamSub:AddToggle({
         end
     end
 })
-SpamSub:AddCheckbox({
+SpamSub:AddToggle({
     Name = "Enable CPS",
     Default = false,
     Callback = function(value) getgenv().ManualSpamCPSEnabled = value end
@@ -1022,7 +1023,7 @@ SpamSub:AddSlider({
         warn_manual_spam_cps(value)
     end
 })
-SpamSub:AddCheckbox({
+SpamSub:AddToggle({
     Name = "Notify",
     Default = false,
     Callback = function(value) getgenv().ManualSpamNotify = value end
@@ -1045,7 +1046,7 @@ SpamSub:AddToggle({
         end
     end
 })
-SpamSub:AddCheckbox({
+SpamSub:AddToggle({
     Name = "Notify",
     Default = false,
     Callback = function(value) getgenv().AutoSpamNotify = value end
@@ -1056,7 +1057,7 @@ SpamSub:AddDropdown({
     Default = "Remote",
     Callback = function(value) getgenv().AutoSpamMode = value end
 })
-SpamSub:AddCheckbox({
+SpamSub:AddToggle({
     Name = "Animation Fix",
     Default = false,
     Callback = function(value) getgenv().AutoSpamAnimationFix = value end
@@ -1118,7 +1119,7 @@ DetectionSub:AddToggle({
         end
     end
 })
-DetectionSub:AddCheckbox({
+DetectionSub:AddToggle({
     Name = "Notify",
     Default = false,
     Callback = function(value) getgenv().InfinityNotify = value end
@@ -1173,7 +1174,7 @@ DetectionSub:AddToggle({
         if getgenv().DribbleNotify then sendNotification("Dribble Detection", state and "ON" or "OFF", 2, state and "success" or "error") end
     end
 })
-DetectionSub:AddCheckbox({
+DetectionSub:AddToggle({
     Name = "Notify",
     Default = false,
     Callback = function(value) getgenv().DribbleNotify = value end
@@ -1212,7 +1213,7 @@ PlayerSub:AddToggle({
         auto_play_set_enabled(value)
     end
 })
-PlayerSub:AddCheckbox({
+PlayerSub:AddToggle({
     Name = "Anti AFK",
     Default = false,
     Callback = function(value)
@@ -1233,12 +1234,12 @@ PlayerSub:AddCheckbox({
         end
     end
 })
-PlayerSub:AddCheckbox({
+PlayerSub:AddToggle({
     Name = "Enable Jumping",
     Default = false,
     Callback = function(value) getgenv().AutoPlayJumpingEnabled = value end
 })
-PlayerSub:AddCheckbox({
+PlayerSub:AddToggle({
     Name = "Auto Vote",
     Default = false,
     Callback = function(value) getgenv().AutoVote = value end
@@ -1381,7 +1382,7 @@ PlayerSub:AddToggle({
     Default = false,
     Callback = function(state) getgenv()._ZX_LookAtBall = state end
 })
-PlayerSub:AddCheckbox({
+PlayerSub:AddToggle({
     Name = "Smooth Look",
     Default = false,
     Callback = function(state) getgenv()._ZX_SmoothLook = state end
@@ -1566,17 +1567,17 @@ VisualSub:AddSlider({
         getgenv().BallTrailHue = value
     end
 })
-VisualSub:AddCheckbox({
+VisualSub:AddToggle({
     Name = "Rainbow Trail",
     Default = false,
     Callback = function(value) getgenv().BallTrailRainbowEnabled = value end
 })
-VisualSub:AddCheckbox({
+VisualSub:AddToggle({
     Name = "Particle Emitter",
     Default = false,
     Callback = function(value) getgenv().BallTrailParticleEnabled = value end
 })
-VisualSub:AddCheckbox({
+VisualSub:AddToggle({
     Name = "Glow Effect",
     Default = false,
     Callback = function(value) getgenv().BallTrailGlowEnabled = value end
@@ -1760,7 +1761,7 @@ VisualSub:AddToggle({
         end
     end
 })
-VisualSub:AddCheckbox({
+VisualSub:AddToggle({
     Name = "Loop Song",
     Default = false,
     Callback = function(value) getgenv().LoopSong = value; currentSound.Looped = value end
@@ -1931,7 +1932,7 @@ VisualSub:AddToggle({
         end
     end
 })
-VisualSub:AddCheckbox({
+VisualSub:AddToggle({
     Name = "Rainbow",
     Default = false,
     Callback = function(value) getgenv().VisualiserRainbow = value end
@@ -2081,7 +2082,7 @@ WorldSub:AddToggle({
         apply_filter_state()
     end
 })
-WorldSub:AddCheckbox({
+WorldSub:AddToggle({
     Name = "Enable Atmosphere",
     Default = false,
     Callback = function(value)
@@ -2100,7 +2101,7 @@ WorldSub:AddSlider({
         if getgenv().FilterEnabled then apply_filter_state() end
     end
 })
-WorldSub:AddCheckbox({
+WorldSub:AddToggle({
     Name = "Enable Saturation",
     Default = false,
     Callback = function(value)
@@ -2119,7 +2120,7 @@ WorldSub:AddSlider({
         if getgenv().FilterEnabled then apply_filter_state() end
     end
 })
-WorldSub:AddCheckbox({
+WorldSub:AddToggle({
     Name = "Enable Hue",
     Default = false,
     Callback = function(value)
@@ -2155,7 +2156,7 @@ WorldSub:AddSection("Lighting")
 WorldSub:AddSlider({Name = "Brightness", Default = 20, Min = 0, Max = 100, Rounding = 1, Callback = function(v) Lighting.Brightness = v / 10 end})
 WorldSub:AddSlider({Name = "Clock Time", Default = 14, Min = 0, Max = 24, Rounding = 1, Callback = function(v) Lighting.ClockTime = v end})
 WorldSub:AddSlider({Name = "Fog End", Default = 100000, Min = 0, Max = 100000, Rounding = 1, Callback = function(v) Lighting.FogEnd = v end})
-WorldSub:AddCheckbox({Name = "Global Shadows", Default = false, Callback = function(v) Lighting.GlobalShadows = v end})
+WorldSub:AddToggle({Name = "Global Shadows", Default = false, Callback = function(v) Lighting.GlobalShadows = v end})
 
 WorldSub:AddSection("Sky Color Override")
 WorldSub:AddToggle({Name = "Sky Color Override", Default = false, Callback = function(state)
