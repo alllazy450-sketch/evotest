@@ -1371,7 +1371,7 @@ workspace.DescendantAdded:Connect(function(obj)
 end)
 
 -- ==========================================
--- BUILD UI — OXIDELIB
+-- BUILD UI — OXIDELIB (tanpa AddSection)
 -- ==========================================
 
 -- TABS
@@ -1388,7 +1388,7 @@ local uiSettingsTab = Window:AddTab({Name = "UI Settings", Icon = "settings-2"})
 -- ==========================================
 -- TAB: FARMING
 -- ==========================================
-farmingTab:AddSection("Automation")
+farmingTab:AddLabel({Text = "Automation"})
 
 farmToggle = farmingTab:AddToggle({
     Name = "Auto Farm",
@@ -1453,7 +1453,7 @@ farmingTab:AddToggle({
     end
 })
 
-farmingTab:AddSection("Status")
+farmingTab:AddLabel({Text = "Status"})
 
 local farmStatLbl = farmingTab:AddLabel({Text = "Farm: Idle"})
 local petStatLbl = farmingTab:AddLabel({Text = "Last Pet: —"})
@@ -1473,7 +1473,7 @@ task.spawn(function()
     end
 end)
 
-farmingTab:AddSection("Auto Farm (Selected)")
+farmingTab:AddLabel({Text = "Auto Farm (Selected)"})
 
 local targetRotationLabel = farmingTab:AddLabel({Text = "Rotation: (none)"})
 
@@ -1542,7 +1542,7 @@ farmingTab:AddToggle({
     end
 })
 
-farmingTab:AddSection("Auto Release")
+farmingTab:AddLabel({Text = "Auto Release"})
 
 farmingTab:AddDropdown({
     Name = "Select Grade",
@@ -1579,7 +1579,7 @@ farmingTab:AddToggle({
     end
 })
 
-farmingTab:AddSection("Skill Configuration")
+farmingTab:AddLabel({Text = "Skill Configuration"})
 
 listSkilConfig = farmingTab:AddLabel({Text = "Skill List: (empty)"})
 
@@ -1653,7 +1653,7 @@ farmingTab:AddLabel({Text = "Info: Entry delay = delay before first skill."})
 -- ==========================================
 -- TAB: SHINY
 -- ==========================================
-shinyTab:AddSection("Detection Modes")
+shinyTab:AddLabel({Text = "Detection Modes"})
 
 shinyTab:AddToggle({
     Name = "Show Pity Overlay",
@@ -1701,7 +1701,7 @@ shinyPrisToggle_ref = shinyTab:AddToggle({
     end
 })
 
-shinyTab:AddSection("Auto Stop Catch")
+shinyTab:AddLabel({Text = "Auto Stop Catch"})
 
 shinyTab:AddToggle({
     Name = "Auto Stop on Shiny",
@@ -1731,7 +1731,7 @@ shinyTab:AddToggle({
     end
 })
 
-shinyTab:AddSection("Ball on Detect")
+shinyTab:AddLabel({Text = "Ball on Detect"})
 
 local BALL_OPTIONS = { "None", "King Ball", "Advanced Ball", "Prismatic Ball" }
 
@@ -1781,7 +1781,7 @@ prisBallDropdown = shinyTab:AddDropdown({
     Callback = applyPrisBallSelection
 })
 
-shinyTab:AddSection("Pity Counter")
+shinyTab:AddLabel({Text = "Pity Counter"})
 
 local pityDisplayLbl = shinyTab:AddLabel({Text = "💎 Prismatic: —/—\n✨ Shiny: —/—"})
 
@@ -1799,7 +1799,7 @@ end)
 -- ==========================================
 -- TAB: ESP
 -- ==========================================
-espTab:AddSection("Player ESP")
+espTab:AddLabel({Text = "Player ESP"})
 
 espTab:AddToggle({
     Name = "Player Highlight + Name + Distance",
@@ -1818,7 +1818,7 @@ espTab:AddLabel({Text = "Blue highlight + name + distance (meters) realtime."})
 -- ==========================================
 -- TAB: BOSS
 -- ==========================================
-bossTab:AddSection("Boss Farm")
+bossTab:AddLabel({Text = "Boss Farm"})
 
 bossTab:AddDropdown({
     Name = "Select Boss",
@@ -1863,7 +1863,7 @@ bossTab:AddToggle({
 -- ==========================================
 -- TAB: CHEST
 -- ==========================================
-chestTab:AddSection("Chest Farm")
+chestTab:AddLabel({Text = "Chest Farm"})
 
 chestTab:AddToggle({
     Name = "Auto Farm Chest",
@@ -1923,7 +1923,7 @@ chestTab:AddInput({
 -- ==========================================
 -- TAB: TELEPORT
 -- ==========================================
-teleportTab:AddSection("Teleport to Player")
+teleportTab:AddLabel({Text = "Teleport to Player"})
 
 teleportTab:AddDropdown({
     Name = "Select Player",
@@ -1960,7 +1960,7 @@ teleportTab:AddButton({
     end
 })
 
-teleportTab:AddSection("Teleport to Island")
+teleportTab:AddLabel({Text = "Teleport to Island"})
 
 local IslandConfig = (function()
     local ok, cfg = pcall(function()
@@ -2041,7 +2041,7 @@ end
 -- ==========================================
 -- TAB: REWARDS
 -- ==========================================
-rewardsTab:AddSection("Claim Rewards")
+rewardsTab:AddLabel({Text = "Claim Rewards"})
 
 rewardsTab:AddButton({
     Name = "Claim All Daily Quest",
@@ -2110,7 +2110,7 @@ rewardsTab:AddButton({
 -- ==========================================
 -- TAB: MISC
 -- ==========================================
-miscTab:AddSection("Player")
+miscTab:AddLabel({Text = "Player"})
 
 miscTab:AddToggle({
     Name = "Anti AFK",
@@ -2196,7 +2196,7 @@ miscTab:AddInput({
     end
 })
 
-miscTab:AddSection("World")
+miscTab:AddLabel({Text = "World"})
 
 miscTab:AddToggle({
     Name = "Fullbright",
@@ -2235,7 +2235,7 @@ miscTab:AddInput({
     end
 })
 
-miscTab:AddSection("Anti Lag")
+miscTab:AddLabel({Text = "Anti Lag"})
 
 miscTab:AddToggle({
     Name = "Anti Lag (Preset — all below)",
@@ -2283,7 +2283,7 @@ miscTab:AddInput({
     end
 })
 
-miscTab:AddSection("Session")
+miscTab:AddLabel({Text = "Session"})
 
 miscTab:AddButton({
     Name = "Rejoin Server",
@@ -2332,7 +2332,7 @@ miscTab:AddButton({
 -- ==========================================
 -- TAB: UI SETTINGS
 -- ==========================================
-uiSettingsTab:AddSection("Menu")
+uiSettingsTab:AddLabel({Text = "Menu"})
 
 uiSettingsTab:AddToggle({
     Name = "Custom Cursor",
@@ -2374,8 +2374,6 @@ uiSettingsTab:AddToggle({
 uiSettingsTab:AddDivider()
 
 uiSettingsTab:AddLabel({Text = "Menu bind"})
--- KeyPicker not directly supported in Oxidelib, but we can add a button to set keybind maybe; we'll just ignore for now or use AddInput.
--- We'll keep the label only.
 
 uiSettingsTab:AddButton({
     Name = "Unload script",
