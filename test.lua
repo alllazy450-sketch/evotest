@@ -1365,7 +1365,7 @@ PlayerSub:AddToggle({
         end
     end
 })
-PlayerSub:AddTextbox({
+PlayerSub:AddInput({
     Name = "Spoofed Name",
     Placeholder = "Enter fake name...",
     Default = "",
@@ -1824,7 +1824,7 @@ VisualSub:AddToggle({
         end
     end
 })
-VisualSub:AddTextbox({
+VisualSub:AddInput({
     Name = "Ping Value",
     Placeholder = "Enter Fake Ping Number",
     Default = "333",
@@ -1980,7 +1980,7 @@ VisualSub:AddToggle({
         end
     end
 })
-VisualSub:AddTextbox({
+VisualSub:AddInput({
     Name = "Custom Announcement Text",
     Placeholder = "Enter Custom Announcement...",
     Default = "discord.gg/Wisnu",
