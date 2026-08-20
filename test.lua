@@ -12,7 +12,7 @@ Library:SetTheme("OLED")
 -- ==========================================
 -- LOGO DAN WINDOW
 -- ==========================================
-local MY_LOGO = "rbxassetid://75991977420487"  -- Logo WISNU HUB
+local MY_LOGO = "rbxassetid://75991977420487"
 
 local Window = Library:CreateWindow({
     Name = "WISNU HUB",
@@ -20,7 +20,7 @@ local Window = Library:CreateWindow({
     Logo = MY_LOGO,
     LogoZoom = 1.5,
     ToggleKey = Enum.KeyCode.RightShift,
-    ProfileKey = Enum.KeyCode.K,   -- tidak digunakan, bisa diabaikan
+    ProfileKey = Enum.KeyCode.K,
     Size = UDim2.fromOffset(720, 500),
     LoadingText = "WISNU HUB",
     LoadingSubtitle = "Loading Blade Ball Engine...",
@@ -247,7 +247,7 @@ local Util = setmetatable({
     end
 }, Util)
 
--- AcrylicBlur (dipertahankan untuk efek visual, tapi tidak digunakan lagi karena Oxidelib tidak membutuhkannya, namun kita biarkan saja)
+-- AcrylicBlur (dipertahankan untuk efek visual)
 local AcrylicBlur = {}
 AcrylicBlur.__index = AcrylicBlur
 
@@ -400,7 +400,7 @@ end
 if (#"">2) then local _q={} _q[1]=2 end
 
 -- ==========================================
--- KONFIGURASI (dipertahankan)
+-- KONFIGURASI
 -- ==========================================
 local Config = setmetatable({
     save = function(self: any, file_name: any, config: any)
@@ -440,13 +440,7 @@ local Config = setmetatable({
 }, Config)
 
 -- ==========================================
--- SISTEM NOTIFIKASI LAMA (diganti dengan Oxidelib, tapi kita pertahankan fungsi untuk kompatibilitas)
--- ==========================================
--- Kita akan menggunakan Window:Notify untuk semua notifikasi, jadi fungsi notifikasi lama bisa dihapus.
--- Tapi beberapa kode mungkin memanggil Library.SendNotification, kita akan redirect ke Window:Notify.
-
--- ==========================================
--- BACKEND UTAMA (System, dll) — SEMUA DIBAWAH INI TIDAK DIRUBAH
+-- BACKEND UTAMA (System, dll)
 -- ==========================================
 
 local ReplicatedStorage = cloneref(game:GetService('ReplicatedStorage'))
@@ -480,17 +474,15 @@ local Player = Players.LocalPlayer
 -- ==========================================
 -- SISTEM PARRY PATCH (dipertahankan)
 -- ==========================================
--- (Sudah didefinisikan di atas)
 
 -- ==========================================
 -- SISTEM SKIN CHANGER, EXPLOSION, EMOTE (dipertahankan)
 -- ==========================================
--- (Kode panjang dipertahankan, lihat script asli)
+-- (Kode panjang dipertahankan, disini disingkat untuk menjaga fokus perbaikan)
 
 -- ==========================================
 -- SISTEM AUTOPLAY, DETEKSI, DLL (dipertahankan)
 -- ==========================================
--- (Semua kode System, triggerbot, manual spam, auto spam, dll dipertahankan)
 
 -- ==========================================
 -- FUNGSI-FUNGSI BACKEND LAINNYA (dipertahankan)
@@ -499,9 +491,6 @@ local Player = Players.LocalPlayer
 -- ==========================================
 -- AKHIR BACKEND, MULAI UI OXIDELIB
 -- ==========================================
-
--- Karena script asli sangat panjang dan backend-nya banyak, kita asumsikan semua kode di atas (sampai sebelum `local library = Library.new()`) sudah disalin.
--- Di sini kita akan mengganti seluruh UI dengan Oxidelib.
 
 -- ==========================================
 -- BUAT TAB-TAB UTAMA
@@ -535,10 +524,11 @@ end
 -- TAB: MAIN (Autoparry, Triggerbot, dll)
 -- ==========================================
 local MainTab = Tabs.Main
+local MainSub = MainTab:AddSubTab("Main")
 
 -- Auto Parry Module
-MainTab:AddSection("Auto Parry")
-local autoParryToggle = MainTab:AddToggle({
+MainSub:AddSection("Auto Parry")
+local autoParryToggle = MainSub:AddToggle({
     Name = "Auto Parry",
     Default = false,
     Callback = function(state)
@@ -555,7 +545,7 @@ local autoParryToggle = MainTab:AddToggle({
     end
 })
 
-MainTab:AddDropdown({
+MainSub:AddDropdown({
     Name = "Parry Mode",
     Options = {"Remote", "Keypress"},
     Default = "Remote",
@@ -564,7 +554,7 @@ MainTab:AddDropdown({
     end
 })
 
-MainTab:AddDropdown({
+MainSub:AddDropdown({
     Name = "Mode curve",
     Options = (System and System.__config and System.__config.__curve_names) or {"Camera", "Random", "Accelerated", "Backwards", "Slow", "High", "Left", "Right", "Straight", "RandomTarget"},
     Default = "Camera",
@@ -580,7 +570,7 @@ MainTab:AddDropdown({
     end
 })
 
-MainTab:AddSlider({
+MainSub:AddSlider({
     Name = "Parry Accuracy",
     Default = 19,
     Min = 1,
@@ -594,19 +584,19 @@ MainTab:AddSlider({
     end
 })
 
-MainTab:AddCheckbox({
+MainSub:AddCheckbox({
     Name = "Cooldown Protection",
     Default = false,
     Callback = function(state) getgenv().CooldownProtection = state end
 })
 
-MainTab:AddCheckbox({
+MainSub:AddCheckbox({
     Name = "Auto Ability",
     Default = false,
     Callback = function(state) getgenv().AutoAbility = state end
 })
 
-MainTab:AddCheckbox({
+MainSub:AddCheckbox({
     Name = "Auto Pre-Click",
     Default = false,
     Callback = function(state)
@@ -660,15 +650,15 @@ MainTab:AddCheckbox({
     end
 })
 
-MainTab:AddCheckbox({
+MainSub:AddCheckbox({
     Name = "Notify",
     Default = false,
     Callback = function(state) getgenv().AutoParryNotify = state end
 })
 
 -- Humanizer Module
-MainTab:AddSection("Humanizer")
-MainTab:AddCheckbox({
+MainSub:AddSection("Humanizer")
+MainSub:AddCheckbox({
     Name = "Humanizer",
     Default = false,
     Callback = function(state)
@@ -678,7 +668,7 @@ MainTab:AddCheckbox({
         end
     end
 })
-MainTab:AddRangeSlider({
+MainSub:AddRangeSlider({
     Name = "Humanizer Accuracy",
     Default = {min = 1, max = 25},
     Min = 1,
@@ -693,8 +683,8 @@ MainTab:AddRangeSlider({
 })
 
 -- Triggerbot Module
-MainTab:AddSection("Triggerbot")
-MainTab:AddToggle({
+MainSub:AddSection("Triggerbot")
+MainSub:AddToggle({
     Name = "Triggerbot",
     Default = false,
     Callback = function(state)
@@ -710,7 +700,7 @@ MainTab:AddToggle({
         end
     end
 })
-MainTab:AddCheckbox({
+MainSub:AddCheckbox({
     Name = "Notify",
     Default = false,
     Callback = function(state) getgenv().TriggerbotNotify = state end
@@ -720,9 +710,10 @@ MainTab:AddCheckbox({
 -- TAB: BLATANT
 -- ==========================================
 local BlatantTab = Tabs.Blatant
+local BlatantSub = BlatantTab:AddSubTab("Blatant")
 
-BlatantTab:AddSection("Movement")
-BlatantTab:AddToggle({
+BlatantSub:AddSection("Movement")
+BlatantSub:AddToggle({
     Name = "Infinite Jump",
     Default = false,
     Callback = function(state)
@@ -746,7 +737,7 @@ BlatantTab:AddToggle({
     end
 })
 
-BlatantTab:AddToggle({
+BlatantSub:AddToggle({
     Name = "Fly",
     Default = false,
     Callback = function(value)
@@ -820,7 +811,7 @@ BlatantTab:AddToggle({
         end
     end
 })
-BlatantTab:AddSlider({
+BlatantSub:AddSlider({
     Name = "Fly Speed",
     Default = 25,
     Min = 10,
@@ -829,7 +820,7 @@ BlatantTab:AddSlider({
     Callback = function(value) getgenv().FlySpeed = value end
 })
 
-BlatantTab:AddToggle({
+BlatantSub:AddToggle({
     Name = "Character Speed",
     Default = false,
     Callback = function(value)
@@ -852,7 +843,7 @@ BlatantTab:AddToggle({
         end
     end
 })
-BlatantTab:AddSlider({
+BlatantSub:AddSlider({
     Name = "Speed Value",
     Default = 36,
     Min = 36,
@@ -861,8 +852,8 @@ BlatantTab:AddSlider({
     Callback = function(value) getgenv().StrafeSpeed = value end
 })
 
-BlatantTab:AddSection("Player Follow")
-BlatantTab:AddToggle({
+BlatantSub:AddSection("Player Follow")
+BlatantSub:AddToggle({
     Name = "Player Follow",
     Default = false,
     Callback = function(value)
@@ -914,7 +905,7 @@ BlatantTab:AddToggle({
         end
     end
 })
-BlatantTab:AddDropdown({
+BlatantSub:AddDropdown({
     Name = "Follow Mode",
     Options = {'Walk', "Teleport"},
     Default = "Walk",
@@ -923,7 +914,7 @@ BlatantTab:AddDropdown({
         if getgenv().FollowNotifyEnabled then sendNotification("Player Follow", "Mode: "..value, 2, "info") end
     end
 })
-BlatantTab:AddSlider({
+BlatantSub:AddSlider({
     Name = "Walk Distance",
     Default = 6,
     Min = 2,
@@ -931,7 +922,7 @@ BlatantTab:AddSlider({
     Rounding = 1,
     Callback = function(value) getgenv().PlayerFollowWalkDistance = math.clamp(tonumber(value) or 6, 2, bit32.bxor(31,6)) end
 })
-BlatantTab:AddSlider({
+BlatantSub:AddSlider({
     Name = "Teleport Distance",
     Default = 4,
     Min = 2,
@@ -939,7 +930,7 @@ BlatantTab:AddSlider({
     Rounding = 1,
     Callback = function(value) getgenv().PlayerFollowTPDistance = math.clamp(tonumber(value) or 4, 2, (15+0)) end
 })
-BlatantTab:AddSlider({
+BlatantSub:AddSlider({
     Name = "Teleport Interval",
     Default = 0.15,
     Min = 0.05,
@@ -948,8 +939,8 @@ BlatantTab:AddSlider({
     Callback = function(value) getgenv().PlayerFollowTPInterval = math.clamp(tonumber(value) or 0.15, 0.05, 1) end
 })
 
-BlatantTab:AddSection("Ability Exploit")
-BlatantTab:AddToggle({
+BlatantSub:AddSection("Ability Exploit")
+BlatantSub:AddToggle({
     Name = "Ability Exploit",
     Default = false,
     Callback = function(value)
@@ -962,7 +953,7 @@ BlatantTab:AddToggle({
         end
     end
 })
-BlatantTab:AddCheckbox({
+BlatantSub:AddCheckbox({
     Name = "Thunder Dash No Cooldown",
     Default = false,
     Callback = function(value)
@@ -976,7 +967,7 @@ BlatantTab:AddCheckbox({
     end
 })
 
-BlatantTab:AddToggle({
+BlatantSub:AddToggle({
     Name = "Semi Immortality",
     Default = false,
     Callback = function(state)
@@ -998,9 +989,10 @@ BlatantTab:AddToggle({
 -- TAB: SPAM
 -- ==========================================
 local SpamTab = Tabs.Spam
+local SpamSub = SpamTab:AddSubTab("Spam")
 
-SpamTab:AddSection("Manual Spam")
-SpamTab:AddToggle({
+SpamSub:AddSection("Manual Spam")
+SpamSub:AddToggle({
     Name = "Manual Spam",
     Default = false,
     Callback = function(state)
@@ -1014,12 +1006,12 @@ SpamTab:AddToggle({
         end
     end
 })
-SpamTab:AddCheckbox({
+SpamSub:AddCheckbox({
     Name = "Enable CPS",
     Default = false,
     Callback = function(value) getgenv().ManualSpamCPSEnabled = value end
 })
-SpamTab:AddSlider({
+SpamSub:AddSlider({
     Name = "CPS",
     Default = 1,
     Min = 1,
@@ -1030,14 +1022,14 @@ SpamTab:AddSlider({
         warn_manual_spam_cps(value)
     end
 })
-SpamTab:AddCheckbox({
+SpamSub:AddCheckbox({
     Name = "Notify",
     Default = false,
     Callback = function(value) getgenv().ManualSpamNotify = value end
 })
 
-SpamTab:AddSection("Auto Spam")
-SpamTab:AddToggle({
+SpamSub:AddSection("Auto Spam")
+SpamSub:AddToggle({
     Name = "Auto Spam",
     Default = false,
     Callback = function(state)
@@ -1053,23 +1045,23 @@ SpamTab:AddToggle({
         end
     end
 })
-SpamTab:AddCheckbox({
+SpamSub:AddCheckbox({
     Name = "Notify",
     Default = false,
     Callback = function(value) getgenv().AutoSpamNotify = value end
 })
-SpamTab:AddDropdown({
+SpamSub:AddDropdown({
     Name = "Mode",
     Options = {"Remote", "Keypress"},
     Default = "Remote",
     Callback = function(value) getgenv().AutoSpamMode = value end
 })
-SpamTab:AddCheckbox({
+SpamSub:AddCheckbox({
     Name = "Animation Fix",
     Default = false,
     Callback = function(value) getgenv().AutoSpamAnimationFix = value end
 })
-SpamTab:AddSlider({
+SpamSub:AddSlider({
     Name = "Parry Threshold",
     Default = 1,
     Min = 1,
@@ -1077,7 +1069,7 @@ SpamTab:AddSlider({
     Rounding = 1,
     Callback = function(value) if System then System.__properties.__spam_threshold = value end end
 })
-SpamTab:AddSlider({
+SpamSub:AddSlider({
     Name = "Distance Multiplier",
     Default = 0.3,
     Min = 0.3,
@@ -1090,9 +1082,10 @@ SpamTab:AddSlider({
 -- TAB: DETECTION
 -- ==========================================
 local DetectionTab = Tabs.Detection
+local DetectionSub = DetectionTab:AddSubTab("Detection")
 
-DetectionTab:AddSection("Staff Detection")
-DetectionTab:AddToggle({
+DetectionSub:AddSection("Staff Detection")
+DetectionSub:AddToggle({
     Name = "Staff Detection",
     Default = false,
     Callback = function(state)
@@ -1107,15 +1100,15 @@ DetectionTab:AddToggle({
         end
     end
 })
-DetectionTab:AddDropdown({
+DetectionSub:AddDropdown({
     Name = "Action Mode",
     Options = {"Notification", "Kick"},
     Default = "Notification",
     Callback = function(value) modActionMode = value end
 })
 
-DetectionTab:AddSection("Ability Detections")
-DetectionTab:AddToggle({
+DetectionSub:AddSection("Ability Detections")
+DetectionSub:AddToggle({
     Name = "Infinity Detection",
     Default = false,
     Callback = function(state)
@@ -1125,13 +1118,13 @@ DetectionTab:AddToggle({
         end
     end
 })
-DetectionTab:AddCheckbox({
+DetectionSub:AddCheckbox({
     Name = "Notify",
     Default = false,
     Callback = function(value) getgenv().InfinityNotify = value end
 })
 
-DetectionTab:AddToggle({
+DetectionSub:AddToggle({
     Name = "Death Slash Detection",
     Default = false,
     Callback = function(state)
@@ -1139,7 +1132,7 @@ DetectionTab:AddToggle({
     end
 })
 
-DetectionTab:AddToggle({
+DetectionSub:AddToggle({
     Name = "Time Hole Detection",
     Default = false,
     Callback = function(state)
@@ -1147,14 +1140,14 @@ DetectionTab:AddToggle({
     end
 })
 
-DetectionTab:AddToggle({
+DetectionSub:AddToggle({
     Name = "Slashes Of Fury Detection",
     Default = false,
     Callback = function(state)
         if System and System.__config then System.__config.__detections.__slashesoffury = state end
     end
 })
-DetectionTab:AddSlider({
+DetectionSub:AddSlider({
     Name = "Parry Delay",
     Default = 0.05,
     Min = 0.05,
@@ -1162,7 +1155,7 @@ DetectionTab:AddSlider({
     Rounding = 3,
     Callback = function(value) parryDelay = value end
 })
-DetectionTab:AddSlider({
+DetectionSub:AddSlider({
     Name = "Max Parry Count",
     Default = 36,
     Min = 1,
@@ -1171,7 +1164,7 @@ DetectionTab:AddSlider({
     Callback = function(value) maxParryCount = value end
 })
 
-DetectionTab:AddToggle({
+DetectionSub:AddToggle({
     Name = "Dribble Detection",
     Default = false,
     Callback = function(state)
@@ -1180,13 +1173,13 @@ DetectionTab:AddToggle({
         if getgenv().DribbleNotify then sendNotification("Dribble Detection", state and "ON" or "OFF", 2, state and "success" or "error") end
     end
 })
-DetectionTab:AddCheckbox({
+DetectionSub:AddCheckbox({
     Name = "Notify",
     Default = false,
     Callback = function(value) getgenv().DribbleNotify = value end
 })
 
-DetectionTab:AddToggle({
+DetectionSub:AddToggle({
     Name = "Anti-Phantom",
     Default = false,
     Callback = function(state)
@@ -1194,7 +1187,7 @@ DetectionTab:AddToggle({
     end
 })
 
-DetectionTab:AddToggle({
+DetectionSub:AddToggle({
     Name = "Singularity Detection",
     Default = false,
     Callback = function(state)
@@ -1209,16 +1202,17 @@ DetectionTab:AddToggle({
 -- TAB: PLAYER
 -- ==========================================
 local PlayerTab = Tabs.Player
+local PlayerSub = PlayerTab:AddSubTab("Player")
 
-PlayerTab:AddSection("Auto Play")
-PlayerTab:AddToggle({
+PlayerSub:AddSection("Auto Play")
+PlayerSub:AddToggle({
     Name = "Auto Play",
     Default = false,
     Callback = function(value)
         auto_play_set_enabled(value)
     end
 })
-PlayerTab:AddCheckbox({
+PlayerSub:AddCheckbox({
     Name = "Anti AFK",
     Default = false,
     Callback = function(value)
@@ -1239,17 +1233,17 @@ PlayerTab:AddCheckbox({
         end
     end
 })
-PlayerTab:AddCheckbox({
+PlayerSub:AddCheckbox({
     Name = "Enable Jumping",
     Default = false,
     Callback = function(value) getgenv().AutoPlayJumpingEnabled = value end
 })
-PlayerTab:AddCheckbox({
+PlayerSub:AddCheckbox({
     Name = "Auto Vote",
     Default = false,
     Callback = function(value) getgenv().AutoVote = value end
 })
-PlayerTab:AddSlider({
+PlayerSub:AddSlider({
     Name = "Distance From Ball",
     Default = 18,
     Min = 5,
@@ -1257,7 +1251,7 @@ PlayerTab:AddSlider({
     Rounding = 1,
     Callback = function(value) getgenv().AutoPlayDistance = value end
 })
-PlayerTab:AddSlider({
+PlayerSub:AddSlider({
     Name = "Speed Multiplier",
     Default = 45,
     Min = 10,
@@ -1265,7 +1259,7 @@ PlayerTab:AddSlider({
     Rounding = 1,
     Callback = function(value) getgenv().AutoPlayMultiplierThreshold = value end
 })
-PlayerTab:AddSlider({
+PlayerSub:AddSlider({
     Name = "Transversing",
     Default = 8,
     Min = 0,
@@ -1273,7 +1267,7 @@ PlayerTab:AddSlider({
     Rounding = 1,
     Callback = function(value) getgenv().AutoPlayTransversing = value end
 })
-PlayerTab:AddSlider({
+PlayerSub:AddSlider({
     Name = "Direction",
     Default = 1,
     Min = -1,
@@ -1281,7 +1275,7 @@ PlayerTab:AddSlider({
     Rounding = 2,
     Callback = function(value) getgenv().AutoPlayDirection = value end
 })
-PlayerTab:AddSlider({
+PlayerSub:AddSlider({
     Name = "Offset Factor",
     Default = 0.4,
     Min = 0.1,
@@ -1289,7 +1283,7 @@ PlayerTab:AddSlider({
     Rounding = 2,
     Callback = function(value) getgenv().AutoPlayOffsetFactor = value end
 })
-PlayerTab:AddSlider({
+PlayerSub:AddSlider({
     Name = "Movement Duration",
     Default = 0.75,
     Min = 0.1,
@@ -1297,7 +1291,7 @@ PlayerTab:AddSlider({
     Rounding = 2,
     Callback = function(value) getgenv().AutoPlayMovementDuration = value end
 })
-PlayerTab:AddSlider({
+PlayerSub:AddSlider({
     Name = "Generation Threshold",
     Default = 0.25,
     Min = 0.1,
@@ -1305,7 +1299,7 @@ PlayerTab:AddSlider({
     Rounding = 2,
     Callback = function(value) getgenv().AutoPlayGenerationThreshold = value end
 })
-PlayerTab:AddSlider({
+PlayerSub:AddSlider({
     Name = "Jump Chance",
     Default = 20,
     Min = 0,
@@ -1313,7 +1307,7 @@ PlayerTab:AddSlider({
     Rounding = 1,
     Callback = function(value) getgenv().AutoPlayJumpPercentage = value end
 })
-PlayerTab:AddSlider({
+PlayerSub:AddSlider({
     Name = "Double Jump Chance",
     Default = 10,
     Min = 0,
@@ -1322,8 +1316,8 @@ PlayerTab:AddSlider({
     Callback = function(value) getgenv().AutoPlayDoubleJumpPercentage = value end
 })
 
-PlayerTab:AddSection("FOV")
-PlayerTab:AddToggle({
+PlayerSub:AddSection("FOV")
+PlayerSub:AddToggle({
     Name = "FOV",
     Default = false,
     Callback = function(state)
@@ -1343,7 +1337,7 @@ PlayerTab:AddToggle({
         end
     end
 })
-PlayerTab:AddSlider({
+PlayerSub:AddSlider({
     Name = "Camera FOV",
     Default = 70,
     Min = 50,
@@ -1355,8 +1349,8 @@ PlayerTab:AddSlider({
     end
 })
 
-PlayerTab:AddSection("Name Spoof")
-PlayerTab:AddToggle({
+PlayerSub:AddSection("Name Spoof")
+PlayerSub:AddToggle({
     Name = "Name Spoof",
     Default = false,
     Callback = function(state)
@@ -1368,7 +1362,7 @@ PlayerTab:AddToggle({
         end
     end
 })
-PlayerTab:AddTextbox({
+PlayerSub:AddTextbox({
     Name = "Spoofed Name",
     Placeholder = "Enter fake name...",
     Default = "",
@@ -1381,25 +1375,25 @@ PlayerTab:AddTextbox({
     end
 })
 
-PlayerTab:AddSection("Look at Ball")
-PlayerTab:AddToggle({
+PlayerSub:AddSection("Look at Ball")
+PlayerSub:AddToggle({
     Name = "Look at Ball",
     Default = false,
     Callback = function(state) getgenv()._ZX_LookAtBall = state end
 })
-PlayerTab:AddCheckbox({
+PlayerSub:AddCheckbox({
     Name = "Smooth Look",
     Default = false,
     Callback = function(state) getgenv()._ZX_SmoothLook = state end
 })
 
-PlayerTab:AddSection("Orbit Ball")
-PlayerTab:AddToggle({
+PlayerSub:AddSection("Orbit Ball")
+PlayerSub:AddToggle({
     Name = "Orbit Ball",
     Default = false,
     Callback = function(state) getgenv()._ZX_OrbitBall = state end
 })
-PlayerTab:AddSlider({
+PlayerSub:AddSlider({
     Name = "Orbit Radius (studs)",
     Default = 14,
     Min = 6,
@@ -1407,7 +1401,7 @@ PlayerTab:AddSlider({
     Rounding = 1,
     Callback = function(value) getgenv()._ZX_OrbitRadius = value end
 })
-PlayerTab:AddSlider({
+PlayerSub:AddSlider({
     Name = "Orbit Speed",
     Default = 4,
     Min = 1,
@@ -1416,13 +1410,13 @@ PlayerTab:AddSlider({
     Callback = function(value) getgenv()._ZX_OrbitSpeed = value end
 })
 
-PlayerTab:AddSection("Hit Sounds")
-PlayerTab:AddToggle({
+PlayerSub:AddSection("Hit Sounds")
+PlayerSub:AddToggle({
     Name = "Hit Sounds",
     Default = false,
     Callback = function(value) hit_Sound_Enabled = value end
 })
-PlayerTab:AddSlider({
+PlayerSub:AddSlider({
     Name = "Volume",
     Default = 5,
     Min = 1,
@@ -1430,7 +1424,7 @@ PlayerTab:AddSlider({
     Rounding = 1,
     Callback = function(value) hit_Sound.Volume = value end
 })
-PlayerTab:AddDropdown({
+PlayerSub:AddDropdown({
     Name = "Hit Sound Type",
     Options = hitSoundOptions,
     Default = hitSoundOptions[1],
@@ -1441,8 +1435,8 @@ PlayerTab:AddDropdown({
     end
 })
 
-PlayerTab:AddSection("Player Cosmetics")
-PlayerTab:AddToggle({
+PlayerSub:AddSection("Player Cosmetics")
+PlayerSub:AddToggle({
     Name = "Headless & Korblox",
     Default = false,
     Callback = function(value)
@@ -1551,14 +1545,15 @@ PlayerTab:AddToggle({
 -- TAB: VISUAL
 -- ==========================================
 local VisualTab = Tabs.Visual
+local VisualSub = VisualTab:AddSubTab("Visual")
 
-VisualTab:AddSection("Ball Trail")
-VisualTab:AddToggle({
+VisualSub:AddSection("Ball Trail")
+VisualSub:AddToggle({
     Name = "Ball Trail",
     Default = false,
     Callback = function(value) getgenv().BallTrailEnabled = value end
 })
-VisualTab:AddSlider({
+VisualSub:AddSlider({
     Name = "Ball Trail Hue",
     Default = 0,
     Min = 0,
@@ -1571,24 +1566,24 @@ VisualTab:AddSlider({
         getgenv().BallTrailHue = value
     end
 })
-VisualTab:AddCheckbox({
+VisualSub:AddCheckbox({
     Name = "Rainbow Trail",
     Default = false,
     Callback = function(value) getgenv().BallTrailRainbowEnabled = value end
 })
-VisualTab:AddCheckbox({
+VisualSub:AddCheckbox({
     Name = "Particle Emitter",
     Default = false,
     Callback = function(value) getgenv().BallTrailParticleEnabled = value end
 })
-VisualTab:AddCheckbox({
+VisualSub:AddCheckbox({
     Name = "Glow Effect",
     Default = false,
     Callback = function(value) getgenv().BallTrailGlowEnabled = value end
 })
 
-VisualTab:AddSection("FPS and Ping")
-VisualTab:AddToggle({
+VisualSub:AddSection("FPS and Ping")
+VisualSub:AddToggle({
     Name = "FPS and Ping",
     Default = false,
     Callback = function(state)
@@ -1752,8 +1747,8 @@ VisualTab:AddToggle({
     end
 })
 
-VisualTab:AddSection("Sound Controller")
-VisualTab:AddToggle({
+VisualSub:AddSection("Sound Controller")
+VisualSub:AddToggle({
     Name = "Sound Controller",
     Default = false,
     Callback = function(value)
@@ -1765,12 +1760,12 @@ VisualTab:AddToggle({
         end
     end
 })
-VisualTab:AddCheckbox({
+VisualSub:AddCheckbox({
     Name = "Loop Song",
     Default = false,
     Callback = function(value) getgenv().LoopSong = value; currentSound.Looped = value end
 })
-VisualTab:AddSlider({
+VisualSub:AddSlider({
     Name = "Volume",
     Default = 3,
     Min = 1,
@@ -1778,7 +1773,7 @@ VisualTab:AddSlider({
     Rounding = 1,
     Callback = function(value) getgenv().SoundControllerVolume = value; currentSound.Volume = value end
 })
-VisualTab:AddDropdown({
+VisualSub:AddDropdown({
     Name = "Select Sound",
     Options = soundOptionNames,
     Default = soundOptionNames[1],
@@ -1791,8 +1786,8 @@ VisualTab:AddDropdown({
     end
 })
 
-VisualTab:AddSection("Ping Spoofer")
-VisualTab:AddToggle({
+VisualSub:AddSection("Ping Spoofer")
+VisualSub:AddToggle({
     Name = "Ping Spoofer",
     Default = false,
     Callback = function(state)
@@ -1826,7 +1821,7 @@ VisualTab:AddToggle({
         end
     end
 })
-VisualTab:AddTextbox({
+VisualSub:AddTextbox({
     Name = "Ping Value",
     Placeholder = "Enter Fake Ping Number",
     Default = "333",
@@ -1838,8 +1833,8 @@ VisualTab:AddTextbox({
     end
 })
 
-VisualTab:AddSection("Ball Stats")
-VisualTab:AddToggle({
+VisualSub:AddSection("Ball Stats")
+VisualSub:AddToggle({
     Name = "Ball Stats",
     Default = false,
     Callback = function(state)
@@ -1852,8 +1847,8 @@ VisualTab:AddToggle({
     end
 })
 
-VisualTab:AddSection("Visualiser")
-VisualTab:AddToggle({
+VisualSub:AddSection("Visualiser")
+VisualSub:AddToggle({
     Name = "Visualiser",
     Default = false,
     Callback = function(value)
@@ -1936,12 +1931,12 @@ VisualTab:AddToggle({
         end
     end
 })
-VisualTab:AddCheckbox({
+VisualSub:AddCheckbox({
     Name = "Rainbow",
     Default = false,
     Callback = function(value) getgenv().VisualiserRainbow = value end
 })
-VisualTab:AddSlider({
+VisualSub:AddSlider({
     Name = "Color Hue",
     Default = 0,
     Min = 0,
@@ -1950,8 +1945,8 @@ VisualTab:AddSlider({
     Callback = function(value) getgenv().VisualiserHue = value end
 })
 
-VisualTab:AddSection("Custom Announcer")
-VisualTab:AddToggle({
+VisualSub:AddSection("Custom Announcer")
+VisualSub:AddToggle({
     Name = "Custom Announcer",
     Default = false,
     Callback = function(value)
@@ -1982,7 +1977,7 @@ VisualTab:AddToggle({
         end
     end
 })
-VisualTab:AddTextbox({
+VisualSub:AddTextbox({
     Name = "Custom Announcement Text",
     Placeholder = "Enter Custom Announcement...",
     Default = "discord.gg/Wisnu",
@@ -1996,8 +1991,8 @@ VisualTab:AddTextbox({
     end
 })
 
-VisualTab:AddSection("Ability ESP")
-VisualTab:AddToggle({
+VisualSub:AddSection("Ability ESP")
+VisualSub:AddToggle({
     Name = "Ability ESP",
     Default = false,
     Callback = function(state)
@@ -2009,14 +2004,15 @@ VisualTab:AddToggle({
 -- TAB: MISC
 -- ==========================================
 local MiscTab = Tabs.Misc
+local MiscSub = MiscTab:AddSubTab("Misc")
 
-MiscTab:AddSection("Optimization")
-MiscTab:AddToggle({
+MiscSub:AddSection("Optimization")
+MiscSub:AddToggle({
     Name = "FPS Booster",
     Default = false,
     Callback = function(state) apply_fps_boost(state) end
 })
-MiscTab:AddToggle({
+MiscSub:AddToggle({
     Name = "Low Graphics",
     Default = false,
     Callback = function(state)
@@ -2043,7 +2039,7 @@ MiscTab:AddToggle({
         end
     end
 })
-MiscTab:AddToggle({
+MiscSub:AddToggle({
     Name = "No Render",
     Default = false,
     Callback = function(state)
@@ -2074,9 +2070,10 @@ MiscTab:AddToggle({
 -- TAB: WORLD
 -- ==========================================
 local WorldTab = Tabs.World
+local WorldSub = WorldTab:AddSubTab("World")
 
-WorldTab:AddSection("Filter")
-WorldTab:AddToggle({
+WorldSub:AddSection("Filter")
+WorldSub:AddToggle({
     Name = "Filter",
     Default = false,
     Callback = function(value)
@@ -2084,7 +2081,7 @@ WorldTab:AddToggle({
         apply_filter_state()
     end
 })
-WorldTab:AddCheckbox({
+WorldSub:AddCheckbox({
     Name = "Enable Atmosphere",
     Default = false,
     Callback = function(value)
@@ -2092,7 +2089,7 @@ WorldTab:AddCheckbox({
         apply_filter_state()
     end
 })
-WorldTab:AddSlider({
+WorldSub:AddSlider({
     Name = "Atmosphere Density",
     Default = 0.5,
     Min = 0,
@@ -2103,7 +2100,7 @@ WorldTab:AddSlider({
         if getgenv().FilterEnabled then apply_filter_state() end
     end
 })
-WorldTab:AddCheckbox({
+WorldSub:AddCheckbox({
     Name = "Enable Saturation",
     Default = false,
     Callback = function(value)
@@ -2111,7 +2108,7 @@ WorldTab:AddCheckbox({
         apply_filter_state()
     end
 })
-WorldTab:AddSlider({
+WorldSub:AddSlider({
     Name = "Saturation Level",
     Default = 0,
     Min = -1,
@@ -2122,7 +2119,7 @@ WorldTab:AddSlider({
         if getgenv().FilterEnabled then apply_filter_state() end
     end
 })
-WorldTab:AddCheckbox({
+WorldSub:AddCheckbox({
     Name = "Enable Hue",
     Default = false,
     Callback = function(value)
@@ -2130,7 +2127,7 @@ WorldTab:AddCheckbox({
         apply_filter_state()
     end
 })
-WorldTab:AddSlider({
+WorldSub:AddSlider({
     Name = "Hue Shift",
     Default = 0,
     Min = -1,
@@ -2142,69 +2139,56 @@ WorldTab:AddSlider({
     end
 })
 
--- Tambahkan modul Atmosphere, Color Correction, Lighting, Sky seperti di backend _ZX_SetupWorldTab
--- Karena fungsi-fungsi tersebut sudah didefinisikan di backend, kita hanya perlu menambahkan UI-nya.
--- Kita akan panggil fungsi setup yang sudah ada.
-getgenv()._ZX_SetupWorldTab = function()
-    local Lighting = game:GetService("Lighting")
-    local function ensureAtmo()
-        local a = Lighting:FindFirstChildOfClass("Atmosphere")
-        if not a then a = Instance.new("Atmosphere"); a.Parent = Lighting end
-        return a
-    end
-    local function ensureCC()
-        local cc = Lighting:FindFirstChildOfClass("ColorCorrectionEffect")
-        if not cc then cc = Instance.new("ColorCorrectionEffect"); cc.Parent = Lighting end
-        return cc
-    end
-    local _origLighting = {}
-    local atmoMod = WorldTab:AddSection("Atmosphere")
-    WorldTab:AddSlider({Name = "Density", Default = 30, Min = 0, Max = 100, Rounding = 1, Callback = function(v) ensureAtmo().Density = v / 100 end})
-    WorldTab:AddSlider({Name = "Offset", Default = 25, Min = 0, Max = 100, Rounding = 1, Callback = function(v) ensureAtmo().Offset = v / 100 end})
-    WorldTab:AddSlider({Name = "Glare", Default = 0, Min = 0, Max = 100, Rounding = 1, Callback = function(v) ensureAtmo().Glare = v / 100 end})
-    WorldTab:AddSlider({Name = "Haze", Default = 10, Min = 0, Max = 100, Rounding = 1, Callback = function(v) ensureAtmo().Haze = v / 100 end})
-    local ccMod = WorldTab:AddSection("Color Correction")
-    WorldTab:AddSlider({Name = "Saturation", Default = 100, Min = 0, Max = 200, Rounding = 1, Callback = function(v) ensureCC().Saturation = (v - 100) / 100 end})
-    WorldTab:AddSlider({Name = "Contrast", Default = 100, Min = 0, Max = 200, Rounding = 1, Callback = function(v) ensureCC().Contrast = (v - 100) / 100 end})
-    WorldTab:AddSlider({Name = "Brightness", Default = 100, Min = 0, Max = 200, Rounding = 1, Callback = function(v) ensureCC().Brightness = (v - 100) / 100 end})
-    local lightMod = WorldTab:AddSection("Lighting")
-    WorldTab:AddSlider({Name = "Brightness", Default = 20, Min = 0, Max = 100, Rounding = 1, Callback = function(v) Lighting.Brightness = v / 10 end})
-    WorldTab:AddSlider({Name = "Clock Time", Default = 14, Min = 0, Max = 24, Rounding = 1, Callback = function(v) Lighting.ClockTime = v end})
-    WorldTab:AddSlider({Name = "Fog End", Default = 100000, Min = 0, Max = 100000, Rounding = 1, Callback = function(v) Lighting.FogEnd = v end})
-    WorldTab:AddCheckbox({Name = "Global Shadows", Default = false, Callback = function(v) Lighting.GlobalShadows = v end})
-    local skyMod = WorldTab:AddSection("Sky Color Override")
-    WorldTab:AddToggle({Name = "Sky Color Override", Default = false, Callback = function(state)
-        if state then
-            _origLighting.SkyAmbient = Lighting.Ambient
-            _origLighting.SkyBright = Lighting.Brightness
-            _origLighting.SkyClock = Lighting.ClockTime
-            _origLighting.SkyOutdoor = Lighting.OutdoorAmbient
-            Lighting.Ambient = Color3.fromRGB(80, 80, 100)
-            Lighting.OutdoorAmbient = Color3.fromRGB(80, 80, 100)
-            Lighting.Brightness = 1.5
-            Lighting.ClockTime = 12
-        else
-            if _origLighting.SkyAmbient then
-                Lighting.Ambient = _origLighting.SkyAmbient
-                Lighting.Brightness = _origLighting.SkyBright
-                Lighting.ClockTime = _origLighting.SkyClock
-                Lighting.OutdoorAmbient = _origLighting.SkyOutdoor
-                _origLighting.SkyAmbient = nil
-            end
+-- Atmosphere, Color Correction, Lighting, Sky
+WorldSub:AddSection("Atmosphere")
+WorldSub:AddSlider({Name = "Density", Default = 30, Min = 0, Max = 100, Rounding = 1, Callback = function(v) ensureAtmo().Density = v / 100 end})
+WorldSub:AddSlider({Name = "Offset", Default = 25, Min = 0, Max = 100, Rounding = 1, Callback = function(v) ensureAtmo().Offset = v / 100 end})
+WorldSub:AddSlider({Name = "Glare", Default = 0, Min = 0, Max = 100, Rounding = 1, Callback = function(v) ensureAtmo().Glare = v / 100 end})
+WorldSub:AddSlider({Name = "Haze", Default = 10, Min = 0, Max = 100, Rounding = 1, Callback = function(v) ensureAtmo().Haze = v / 100 end})
+
+WorldSub:AddSection("Color Correction")
+WorldSub:AddSlider({Name = "Saturation", Default = 100, Min = 0, Max = 200, Rounding = 1, Callback = function(v) ensureCC().Saturation = (v - 100) / 100 end})
+WorldSub:AddSlider({Name = "Contrast", Default = 100, Min = 0, Max = 200, Rounding = 1, Callback = function(v) ensureCC().Contrast = (v - 100) / 100 end})
+WorldSub:AddSlider({Name = "Brightness", Default = 100, Min = 0, Max = 200, Rounding = 1, Callback = function(v) ensureCC().Brightness = (v - 100) / 100 end})
+
+WorldSub:AddSection("Lighting")
+WorldSub:AddSlider({Name = "Brightness", Default = 20, Min = 0, Max = 100, Rounding = 1, Callback = function(v) Lighting.Brightness = v / 10 end})
+WorldSub:AddSlider({Name = "Clock Time", Default = 14, Min = 0, Max = 24, Rounding = 1, Callback = function(v) Lighting.ClockTime = v end})
+WorldSub:AddSlider({Name = "Fog End", Default = 100000, Min = 0, Max = 100000, Rounding = 1, Callback = function(v) Lighting.FogEnd = v end})
+WorldSub:AddCheckbox({Name = "Global Shadows", Default = false, Callback = function(v) Lighting.GlobalShadows = v end})
+
+WorldSub:AddSection("Sky Color Override")
+WorldSub:AddToggle({Name = "Sky Color Override", Default = false, Callback = function(state)
+    if state then
+        _origLighting.SkyAmbient = Lighting.Ambient
+        _origLighting.SkyBright = Lighting.Brightness
+        _origLighting.SkyClock = Lighting.ClockTime
+        _origLighting.SkyOutdoor = Lighting.OutdoorAmbient
+        Lighting.Ambient = Color3.fromRGB(80, 80, 100)
+        Lighting.OutdoorAmbient = Color3.fromRGB(80, 80, 100)
+        Lighting.Brightness = 1.5
+        Lighting.ClockTime = 12
+    else
+        if _origLighting.SkyAmbient then
+            Lighting.Ambient = _origLighting.SkyAmbient
+            Lighting.Brightness = _origLighting.SkyBright
+            Lighting.ClockTime = _origLighting.SkyClock
+            Lighting.OutdoorAmbient = _origLighting.SkyOutdoor
+            _origLighting.SkyAmbient = nil
         end
-    end})
-    WorldTab:AddSlider({Name = "Brightness", Default = 150, Min = 0, Max = 300, Rounding = 1, Callback = function(v) Lighting.Brightness = v / 100 end})
-    WorldTab:AddSlider({Name = "Time of Day", Default = 12, Min = 0, Max = 24, Rounding = 1, Callback = function(v) Lighting.ClockTime = v end})
-end
-getgenv()._ZX_SetupWorldTab()
+    end
+end})
+WorldSub:AddSlider({Name = "Brightness", Default = 150, Min = 0, Max = 300, Rounding = 1, Callback = function(v) Lighting.Brightness = v / 100 end})
+WorldSub:AddSlider({Name = "Time of Day", Default = 12, Min = 0, Max = 24, Rounding = 1, Callback = function(v) Lighting.ClockTime = v end})
 
 -- ==========================================
 -- TAB: GUI
 -- ==========================================
 local GuiTab = Tabs.GUI
+local GuiSub = GuiTab:AddSubTab("GUI")
 
-GuiTab:AddSection("GUI")
-GuiTab:AddToggle({
+GuiSub:AddSection("GUI")
+GuiSub:AddToggle({
     Name = "GUI Visible",
     Default = false,
     Callback = function(state)
@@ -2216,15 +2200,15 @@ GuiTab:AddToggle({
         end
     end
 })
--- Tema Oxidelib bisa diatur melalui pengaturan UI Settings, jadi tidak perlu tema kustom.
 
 -- ==========================================
 -- TAB: UNLOCK
 -- ==========================================
 local UnlockTab = Tabs.Unlock
+local UnlockSub = UnlockTab:AddSubTab("Unlock")
 
-UnlockTab:AddSection("Unlock All")
-UnlockTab:AddToggle({
+UnlockSub:AddSection("Unlock All")
+UnlockSub:AddToggle({
     Name = "Unlock All",
     Default = false,
     Callback = function(state)
@@ -2236,11 +2220,9 @@ UnlockTab:AddToggle({
 })
 
 -- ==========================================
--- FUNGSI-FUNGSI SETUP TAMBAHAN (dipanggil setelah UI)
+-- FUNGSI-FUNGSI SETUP TAMBAHAN
 -- ==========================================
-
--- Fungsi-fungsi setup seperti _ZX_SetupSingularity, _ZX_SetupLookAtBall, _ZX_SetupOrbitBall, _ZX_SetupNameSpoof, _ZX_SetupWorldTab sudah dipanggil di backend, tetapi untuk memastikan, kita panggil lagi.
--- Namun, karena beberapa di antaranya menambahkan modul UI, kita sudah menambahkan UI-nya secara manual di atas, jadi kita tidak perlu memanggilnya lagi.
+-- (Fungsi-fungsi seperti _ZX_SetupSingularity, _ZX_SetupLookAtBall, dll sudah didefinisikan di backend)
 
 -- ==========================================
 -- NOTIFIKASI AWAL
@@ -2253,7 +2235,3 @@ Window:Notify({
 })
 
 print("✅ WISNU HUB BLADE BALL — OXIDELIB PORT SUCCESS!")
-
--- ==========================================
--- AKHIR SCRIPT
--- ==========================================
