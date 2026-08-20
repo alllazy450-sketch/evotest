@@ -584,7 +584,6 @@ MainSub:AddSlider({
     end
 })
 
--- AddCheckbox → AddToggle
 MainSub:AddToggle({
     Name = "Cooldown Protection",
     Default = false,
@@ -669,16 +668,19 @@ MainSub:AddToggle({
         end
     end
 })
-MainSub:AddRangeSlider({
+
+-- Ganti AddRangeSlider dengan satu slider tunggal
+MainSub:AddSlider({
     Name = "Humanizer Accuracy",
-    Default = {min = 1, max = 25},
+    Default = 10,  -- nilai tengah
     Min = 1,
     Max = 25,
     Rounding = 1,
-    Callback = function(min_val, max_val)
+    Callback = function(value)
         if System then
-            System.__properties.__humanizer_min_accuracy = min_val
-            System.__properties.__humanizer_max_accuracy = max_val
+            -- Set min dan max ke nilai yang sama agar tidak merusak backend
+            System.__properties.__humanizer_min_accuracy = value
+            System.__properties.__humanizer_max_accuracy = value
         end
     end
 })
