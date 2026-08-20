@@ -1453,6 +1453,8 @@ farmingTab:AddToggle({
     end
 })
 
+farmingTab:AddDivider()
+
 farmingTab:AddLabel({Text = "Status"})
 
 local farmStatLbl = farmingTab:AddLabel({Text = "Farm: Idle"})
@@ -1472,6 +1474,8 @@ task.spawn(function()
         if S.LastPetName then pcall(function() petStatLbl:SetText("Last Pet: "..S.LastPetName) end) end
     end
 end)
+
+farmingTab:AddDivider()
 
 farmingTab:AddLabel({Text = "Auto Farm (Selected)"})
 
@@ -1542,6 +1546,8 @@ farmingTab:AddToggle({
     end
 })
 
+farmingTab:AddDivider()
+
 farmingTab:AddLabel({Text = "Auto Release"})
 
 farmingTab:AddDropdown({
@@ -1578,6 +1584,8 @@ farmingTab:AddToggle({
         end
     end
 })
+
+farmingTab:AddDivider()
 
 farmingTab:AddLabel({Text = "Skill Configuration"})
 
@@ -1701,6 +1709,8 @@ shinyPrisToggle_ref = shinyTab:AddToggle({
     end
 })
 
+shinyTab:AddDivider()
+
 shinyTab:AddLabel({Text = "Auto Stop Catch"})
 
 shinyTab:AddToggle({
@@ -1730,6 +1740,8 @@ shinyTab:AddToggle({
         end
     end
 })
+
+shinyTab:AddDivider()
 
 shinyTab:AddLabel({Text = "Ball on Detect"})
 
@@ -1780,6 +1792,8 @@ prisBallDropdown = shinyTab:AddDropdown({
     Searchable = true,
     Callback = applyPrisBallSelection
 })
+
+shinyTab:AddDivider()
 
 shinyTab:AddLabel({Text = "Pity Counter"})
 
@@ -1959,6 +1973,8 @@ teleportTab:AddButton({
         end
     end
 })
+
+teleportTab:AddDivider()
 
 teleportTab:AddLabel({Text = "Teleport to Island"})
 
@@ -2196,6 +2212,8 @@ miscTab:AddInput({
     end
 })
 
+miscTab:AddDivider()
+
 miscTab:AddLabel({Text = "World"})
 
 miscTab:AddToggle({
@@ -2234,6 +2252,8 @@ miscTab:AddInput({
         end
     end
 })
+
+miscTab:AddDivider()
 
 miscTab:AddLabel({Text = "Anti Lag"})
 
@@ -2282,6 +2302,8 @@ miscTab:AddInput({
         end
     end
 })
+
+miscTab:AddDivider()
 
 miscTab:AddLabel({Text = "Session"})
 
